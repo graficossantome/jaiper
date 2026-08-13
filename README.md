@@ -38,7 +38,6 @@ se borran los datos del navegador o se cambia de móvil, el historial se pierde.
 | `manifest.webmanifest` | Metadatos de la PWA (nombre, colores, iconos) |
 | `icono-*.png` | Iconos de la pantalla de inicio |
 | `generar-iconos.py` | Regenera los PNG si cambia la paleta; no hace falta para usar la app |
-| `.github/workflows/pages.yml` | Publica el repo en Pages en cada push a `main` |
 
 ## Las reglas que implementa
 
