@@ -1,0 +1,1510 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jaipur · Simi e Inés</title>
+<meta name="description" content="Marcador de Jaipur para las partidas de Simi e Inés: sigue las ventas, cuenta las rupias y guarda el cara a cara.">
+<meta name="theme-color" content="#fff8f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a1210" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icono-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="icono-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Jaipur">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+/* ---------------------------------------------------------------
+   Paleta: la ciudad rosa y las especias. Simi va en fucsia e Inés
+   en jade; los dos colores pasan AA sobre sus fondos en los dos temas.
+   --------------------------------------------------------------- */
+:root {
+  color-scheme: light dark;
+
+  --fondo: #fff8f0;
+  --tarjeta: #ffffff;
+  --tarjeta-hundida: #fdf0e4;
+  --borde: #efdccb;
+  --texto: #2b1b16;
+  --tenue: #75584c;
+  --simi: #c2185b;
+  --simi-suave: #fde7ef;
+  --ines: #00695c;
+  --ines-suave: #e0f2ef;
+  --oro: #9a5b00;
+  --oro-suave: #fdf0d9;
+  --foco: #0b57d0;
+
+  --radio: 16px;
+  --radio-s: 10px;
+  --sombra: 0 1px 2px rgba(74, 38, 20, .08), 0 6px 16px rgba(74, 38, 20, .06);
+  --transicion: 140ms ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #1a1210;
+    --tarjeta: #251a17;
+    --tarjeta-hundida: #2f211d;
+    --borde: #43302a;
+    --texto: #f7eae1;
+    --tenue: #c2a99e;
+    --simi: #ff8fb1;
+    --simi-suave: #3d1d2a;
+    --ines: #5fd6c0;
+    --ines-suave: #123330;
+    --oro: #f0b95e;
+    --oro-suave: #3a2a13;
+    --foco: #9ec2ff;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0 max(12px, env(safe-area-inset-left)) calc(84px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-right));
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 17px;
+  line-height: 1.4;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior-y: contain;
+}
+
+h1, h2, h3 { line-height: 1.15; margin: 0; }
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border: 0;
+  background: none;
+  /* 44px es el mínimo táctil de WCAG; casi todo aquí se pulsa a una mano y con prisa */
+  min-height: 44px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--foco);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.visualmente-oculta {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- Cabecera ------------------------------------------------- */
+
+.cabecera {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: max(10px, env(safe-area-inset-top)) 4px 8px;
+}
+
+.cabecera h1 {
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  font-size: 1.32rem;
+  font-weight: 600;
+  letter-spacing: -.01em;
+}
+
+.cabecera .ronda {
+  margin: 0;
+  margin-inline-start: auto;
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--tenue);
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  padding: 5px 12px;
+}
+
+.btn-icono {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  border-radius: 999px;
+  font-size: 1.15rem;
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
+}
+
+/* --- Marcador ------------------------------------------------- */
+
+.marcador {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.jugadora {
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-top: 4px solid var(--color-j);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 10px 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.jugadora[data-j="0"] { --color-j: var(--simi); --suave-j: var(--simi-suave); }
+.jugadora[data-j="1"] { --color-j: var(--ines); --suave-j: var(--ines-suave); }
+
+.jugadora h2 {
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--color-j);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rupias {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.03em;
+}
+
+.rupias small {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--tenue);
+  margin-inline-start: 4px;
+  letter-spacing: 0;
+}
+
+.pie-jugadora {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.sellos { display: flex; gap: 4px; }
+
+.sello {
+  width: 15px; height: 15px;
+  border-radius: 50%;
+  border: 2px solid var(--color-j);
+}
+
+.sello.ganado { background: var(--color-j); }
+
+.btn-camellos {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--tarjeta-hundida);
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: .9rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.btn-camellos .lidera {
+  color: var(--oro);
+  font-weight: 700;
+  font-size: .78rem;
+}
+
+/* --- Aviso de fin de ronda ------------------------------------ */
+
+.aviso {
+  margin: 12px 0 0;
+  background: var(--oro-suave);
+  border: 1px solid var(--oro);
+  border-radius: var(--radio);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.aviso p { margin: 0; flex: 1 1 140px; font-size: .93rem; font-weight: 600; }
+.aviso[hidden] { display: none; }
+
+/* --- Montones ------------------------------------------------- */
+
+.titulo-seccion {
+  margin: 18px 0 8px;
+  font-size: .78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--tenue);
+}
+
+.montones {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.monton {
+  width: 100%;
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 10px 12px 12px;
+  text-align: start;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform var(--transicion), box-shadow var(--transicion);
+}
+
+.monton:active { transform: scale(.975); }
+
+.monton-cabeza {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-weight: 700;
+  font-size: .98rem;
+}
+
+.monton-cabeza .restantes {
+  margin-inline-start: auto;
+  font-size: .74rem;
+  font-weight: 600;
+  color: var(--tenue);
+  font-variant-numeric: tabular-nums;
+}
+
+.fichas { display: flex; flex-wrap: wrap; gap: 4px; }
+
+.ficha {
+  min-width: 26px;
+  padding: 3px 6px;
+  border-radius: 8px;
+  background: var(--tarjeta-hundida);
+  border: 1px solid var(--borde);
+  color: var(--tenue);
+  font-size: .82rem;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* La de arriba es la que se lleva la próxima venta: se destaca sola */
+.ficha.siguiente {
+  background: var(--oro-suave);
+  border-color: var(--oro);
+  color: var(--oro);
+}
+
+.monton.agotado { opacity: .55; }
+
+.monton .agotado-txt {
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--tenue);
+}
+
+/* --- Barra inferior ------------------------------------------- */
+
+.barra {
+  position: fixed;
+  inset: auto 0 0 0;
+  display: flex;
+  gap: 10px;
+  padding: 10px max(12px, env(safe-area-inset-left)) calc(10px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-right));
+  background: color-mix(in srgb, var(--fondo) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--borde);
+}
+
+.btn {
+  flex: 1;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-weight: 700;
+  font-size: 1rem;
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
+  transition: transform var(--transicion);
+}
+
+.btn:active { transform: scale(.98); }
+/* Deshacer cede el ancho para que «Se acabó el mazo» no parta en dos líneas */
+.btn.estrecho { flex: 0 1 auto; }
+.btn[disabled] { opacity: .45; cursor: default; }
+.btn.principal { background: var(--texto); color: var(--fondo); border-color: var(--texto); }
+.btn.simi { background: var(--simi); color: #fff; border-color: var(--simi); }
+.btn.ines { background: var(--ines); color: #fff; border-color: var(--ines); }
+
+@media (prefers-color-scheme: dark) {
+  .btn.simi, .btn.ines { color: #1a1210; }
+}
+
+/* --- Diálogos -------------------------------------------------- */
+
+dialog {
+  width: min(520px, 100%);
+  max-height: 88dvh;
+  margin: auto auto 0;
+  padding: 18px 18px calc(18px + env(safe-area-inset-bottom));
+  border: 0;
+  border-radius: 22px 22px 0 0;
+  background: var(--fondo);
+  color: var(--texto);
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, .28);
+  overflow-y: auto;
+}
+
+@media (min-width: 560px) {
+  dialog { margin: auto; border-radius: 22px; max-height: 86dvh; }
+}
+
+dialog::backdrop { background: rgba(40, 20, 12, .55); }
+
+dialog h2 {
+  font-size: 1.22rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+dialog .sub {
+  margin: 0 0 14px;
+  color: var(--tenue);
+  font-size: .92rem;
+}
+
+fieldset { border: 0; margin: 0 0 14px; padding: 0; }
+
+legend {
+  padding: 0;
+  font-size: .78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--tenue);
+  margin-bottom: 8px;
+}
+
+.opciones { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.opcion {
+  flex: 1 1 auto;
+  min-width: 62px;
+  border-radius: 12px;
+  border: 1px solid var(--borde);
+  background: var(--tarjeta);
+  padding: 8px 10px;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  transition: transform var(--transicion);
+}
+
+.opcion .pista {
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--tenue);
+  font-variant-numeric: tabular-nums;
+}
+
+.opcion[aria-pressed="true"] {
+  background: var(--texto);
+  color: var(--fondo);
+  border-color: var(--texto);
+}
+
+.opcion[aria-pressed="true"] .pista { color: var(--fondo); opacity: .75; }
+.opcion[disabled] { opacity: .38; cursor: default; }
+.opcion:active:not([disabled]) { transform: scale(.96); }
+
+.acciones { display: flex; gap: 8px; margin-top: 4px; }
+
+/* Un .btn suelto dentro de un diálogo no tiene contenedor flex que lo estire */
+dialog > .btn { width: 100%; }
+
+.enlace-sutil {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px;
+  font-size: .9rem;
+  font-weight: 600;
+  color: var(--tenue);
+  text-decoration: underline;
+}
+
+/* --- Recuento de la ronda -------------------------------------- */
+
+.recuento {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.recuento caption {
+  text-align: start;
+  font-size: .78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--tenue);
+  padding-bottom: 8px;
+}
+
+.recuento th, .recuento td {
+  padding: 7px 6px;
+  border-bottom: 1px solid var(--borde);
+  text-align: end;
+  font-size: .95rem;
+}
+
+.recuento th[scope="row"] { text-align: start; font-weight: 600; color: var(--tenue); }
+.recuento thead th { font-size: .85rem; }
+.recuento thead th:nth-child(2) { color: var(--simi); }
+.recuento thead th:nth-child(3) { color: var(--ines); }
+.recuento .total td, .recuento .total th { font-weight: 800; font-size: 1.15rem; border-bottom: 0; }
+
+.veredicto {
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 14px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.veredicto .quien { font-size: 1.3rem; font-weight: 800; margin: 0; }
+.veredicto .porque { margin: 4px 0 0; font-size: .88rem; color: var(--tenue); }
+
+/* --- Estadísticas ---------------------------------------------- */
+
+.duelo {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 14px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.duelo .cifra { font-size: 2.6rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.duelo .cifra.simi { color: var(--simi); }
+.duelo .cifra.ines { color: var(--ines); }
+.duelo .quien { display: block; font-size: .82rem; font-weight: 700; color: var(--tenue); margin-top: 4px; }
+.duelo .vs { font-size: .8rem; font-weight: 700; color: var(--tenue); }
+
+.datos { list-style: none; margin: 0 0 14px; padding: 0; }
+
+.datos li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 9px 2px;
+  border-bottom: 1px solid var(--borde);
+  font-size: .95rem;
+}
+
+.datos .etiqueta { color: var(--tenue); }
+.datos .valor { font-weight: 700; text-align: end; font-variant-numeric: tabular-nums; }
+
+.vacio {
+  text-align: center;
+  color: var(--tenue);
+  padding: 22px 10px;
+  font-size: .95rem;
+}
+
+/* --- Celebración ------------------------------------------------ */
+
+.confeti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.confeti i {
+  position: absolute;
+  top: -12px;
+  width: 9px;
+  height: 14px;
+  border-radius: 2px;
+  animation: caer linear forwards;
+}
+
+@keyframes caer {
+  to { transform: translateY(102dvh) rotate(720deg); opacity: .9; }
+}
+
+/* Sin movimiento: la celebración no se dibuja siquiera (ver celebrar() en el JS),
+   pero se blinda también aquí por si algún estilo se cuela. */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  .confeti { display: none; }
+  .monton:active, .opcion:active, .btn:active { transform: none; }
+}
+
+.tabla-reglas { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: .9rem; }
+.tabla-reglas th, .tabla-reglas td { padding: 6px; border-bottom: 1px solid var(--borde); text-align: start; }
+.tabla-reglas td:last-child { text-align: end; font-variant-numeric: tabular-nums; color: var(--tenue); }
+.reglas-texto { font-size: .93rem; }
+.reglas-texto li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<header class="cabecera">
+  <h1>Jaipur 💕</h1>
+  <p class="ronda" id="etiqueta-ronda">Ronda 1</p>
+  <button type="button" class="btn-icono" id="btn-menu" aria-label="Menú">⋯</button>
+</header>
+
+<section class="marcador" aria-label="Marcador">
+  <article class="jugadora" data-j="0">
+    <h2 id="nombre-0">Simi</h2>
+    <p class="rupias"><span id="rupias-0">0</span><small>rupias</small></p>
+    <div class="pie-jugadora">
+      <p class="sellos" id="sellos-0" aria-label="Sellos de Simi: 0 de 2"></p>
+      <button type="button" class="btn-camellos" data-camellos="0">
+        <span aria-hidden="true">🐫</span>
+        <span id="camellos-0">0</span>
+        <span class="visualmente-oculta">camellos de Simi, pulsa para cambiar</span>
+      </button>
+    </div>
+  </article>
+  <article class="jugadora" data-j="1">
+    <h2 id="nombre-1">Inés</h2>
+    <p class="rupias"><span id="rupias-1">0</span><small>rupias</small></p>
+    <div class="pie-jugadora">
+      <p class="sellos" id="sellos-1" aria-label="Sellos de Inés: 0 de 2"></p>
+      <button type="button" class="btn-camellos" data-camellos="1">
+        <span aria-hidden="true">🐫</span>
+        <span id="camellos-1">0</span>
+        <span class="visualmente-oculta">camellos de Inés, pulsa para cambiar</span>
+      </button>
+    </div>
+  </article>
+</section>
+
+<main>
+  <div class="aviso" id="aviso-fin" hidden>
+    <p id="aviso-texto"></p>
+    <button type="button" class="btn principal" id="btn-contar">Contar la ronda</button>
+  </div>
+
+  <h2 class="titulo-seccion">Montones de mercancía</h2>
+  <ul class="montones" id="montones"></ul>
+</main>
+
+<footer class="barra">
+  <button type="button" class="btn estrecho" id="btn-deshacer" disabled>↩︎ Deshacer</button>
+  <button type="button" class="btn" id="btn-fin-ronda">Se acabó el mazo</button>
+</footer>
+
+<div id="anuncio" class="visualmente-oculta" role="status" aria-live="polite"></div>
+
+<dialog id="dlg-venta" aria-labelledby="venta-titulo"></dialog>
+<dialog id="dlg-bonus" aria-labelledby="bonus-titulo"></dialog>
+<dialog id="dlg-camellos" aria-labelledby="camellos-titulo"></dialog>
+<dialog id="dlg-ronda" aria-labelledby="ronda-titulo"></dialog>
+<dialog id="dlg-menu" aria-labelledby="menu-titulo"></dialog>
+<dialog id="dlg-stats" aria-labelledby="stats-titulo"></dialog>
+<dialog id="dlg-reglas" aria-labelledby="reglas-titulo"></dialog>
+
+<script>
+'use strict';
+
+/* =================================================================
+   Datos del juego
+   ================================================================= */
+
+// 38 fichas de mercancía en total, que es lo que dice el reglamento.
+const MERCANCIAS = [
+  { id: 'diamantes', nombre: 'Diamantes', emoji: '💎', fichas: [7, 7, 5, 5, 5],          cartas: 6,  preciosa: true },
+  { id: 'oro',       nombre: 'Oro',       emoji: '🥇', fichas: [6, 6, 5, 5, 5],          cartas: 6,  preciosa: true },
+  { id: 'plata',     nombre: 'Plata',     emoji: '🥈', fichas: [5, 5, 5, 5, 5],          cartas: 6,  preciosa: true },
+  { id: 'tela',      nombre: 'Tela',      emoji: '🧵', fichas: [5, 3, 3, 2, 2, 1, 1],    cartas: 8,  preciosa: false },
+  { id: 'especias',  nombre: 'Especias',  emoji: '🌶️', fichas: [5, 3, 3, 2, 2, 1, 1],    cartas: 8,  preciosa: false },
+  { id: 'cuero',     nombre: 'Cuero',     emoji: '👜', fichas: [4, 3, 2, 1, 1, 1, 1, 1, 1], cartas: 10, preciosa: false }
+];
+
+// Las de bonus salen boca abajo: solo se sabe el rango hasta que se le da la vuelta.
+const BONUS = {
+  3: { valores: [1, 2, 3],  total: 7 },
+  4: { valores: [4, 5, 6],  total: 6 },
+  5: { valores: [8, 9, 10], total: 5 }
+};
+
+const CAMELLO = 5;         // la ficha de camellos vale 5 rupias
+const SELLOS_PARA_GANAR = 2;
+const MANO_MAXIMA = 7;     // no se pueden tener más de 7 cartas, así que no se venden más de 7 de golpe
+const MONTONES_PARA_ACABAR = 3;
+const JUGADORAS = ['Simi', 'Inés'];
+const CLAVE = 'jaipur-simi-ines-v1';
+
+/* =================================================================
+   Estado
+   ================================================================= */
+
+let estado = cargar() || estadoInicial();
+const pilaDeshacer = [];   // en memoria: deshacer sirve durante la partida, no entre sesiones
+
+function estadoInicial() {
+  return { partida: partidaNueva(), historial: [] };
+}
+
+function partidaNueva() {
+  return { sellos: [0, 0], ronda: 1, rondas: [], ...rondaNueva() };
+}
+
+function rondaNueva() {
+  const montones = {};
+  for (const m of MERCANCIAS) montones[m.id] = m.fichas.slice();
+  const bonusRestantes = {};
+  for (const n of [3, 4, 5]) bonusRestantes[n] = BONUS[n].total;
+  return {
+    montones,
+    bonusRestantes,
+    tomado: [
+      { mercancias: [], bonus: [], camellos: 0 },
+      { mercancias: [], bonus: [], camellos: 0 }
+    ]
+  };
+}
+
+function cargar() {
+  try {
+    const crudo = localStorage.getItem(CLAVE);
+    if (!crudo) return null;
+    const datos = JSON.parse(crudo);
+    // Un guardado a medias (pestaña cerrada en mitad de una escritura) no debe
+    // dejar la app en blanco ni reventar al pintar: se descarta y se empieza limpio.
+    if (!datos || !datos.partida || !Array.isArray(datos.historial)) return null;
+    return datos;
+  } catch (e) {
+    return null;
+  }
+}
+
+function persistir() {
+  try {
+    localStorage.setItem(CLAVE, JSON.stringify(estado));
+  } catch (e) {
+    anunciar('No se pudo guardar en este navegador. La partida sigue en pantalla.');
+  }
+}
+
+function clonar(x) { return JSON.parse(JSON.stringify(x)); }
+
+function guardarParaDeshacer() {
+  pilaDeshacer.push(clonar(estado));
+  if (pilaDeshacer.length > 60) pilaDeshacer.shift();
+}
+
+function deshacer() {
+  if (!pilaDeshacer.length) return;
+  estado = pilaDeshacer.pop();
+  persistir();
+  pintar();
+  anunciar('Deshecho.');
+}
+
+/* =================================================================
+   Reglas
+   ================================================================= */
+
+function mercancia(id) { return MERCANCIAS.find(m => m.id === id); }
+
+/** Cuántas cartas se pueden vender de golpe: limita la mano y el mazo. */
+function maximoVendible(m) { return Math.min(MANO_MAXIMA, m.cartas); }
+
+/** Fichas que se llevaría quien vendiese `cantidad` cartas: las de arriba del montón. */
+function fichasQueSeLleva(idMercancia, cantidad) {
+  return estado.partida.montones[idMercancia].slice(0, cantidad);
+}
+
+/** Nivel de bonus que toca por una venta (5 o más cartas usan el montón de 5). */
+function nivelBonus(cantidad) {
+  if (cantidad >= 5) return 5;
+  if (cantidad >= 3) return cantidad;
+  return 0;
+}
+
+function rupias(j) {
+  const t = estado.partida.tomado[j];
+  return suma(t.mercancias) + suma(t.bonus);
+}
+
+function suma(lista) { return lista.reduce((a, b) => a + b, 0); }
+
+function montonesAgotados() {
+  return MERCANCIAS.filter(m => estado.partida.montones[m.id].length === 0).length;
+}
+
+function rondaTerminada() {
+  return montonesAgotados() >= MONTONES_PARA_ACABAR;
+}
+
+/** Quién se lleva la ficha de camellos: -1 si están empatados. */
+function lideraCamellos() {
+  const [a, b] = estado.partida.tomado.map(t => t.camellos);
+  if (a === b) return -1;
+  return a > b ? 0 : 1;
+}
+
+/* =================================================================
+   Acciones
+   ================================================================= */
+
+function registrarVenta(j, idMercancia, cantidad, valorBonus) {
+  guardarParaDeshacer();
+  const p = estado.partida;
+  const llevadas = p.montones[idMercancia].splice(0, cantidad);
+  p.tomado[j].mercancias.push(...llevadas);
+
+  const nivel = nivelBonus(cantidad);
+  if (nivel && valorBonus) {
+    p.tomado[j].bonus.push(valorBonus);
+    p.bonusRestantes[nivel] = Math.max(0, p.bonusRestantes[nivel] - 1);
+  }
+
+  persistir();
+  pintar();
+
+  const m = mercancia(idMercancia);
+  const total = suma(llevadas) + (valorBonus || 0);
+  anunciar(`${JUGADORAS[j]} vende ${cantidad} de ${m.nombre.toLowerCase()}: ${total} rupias. Va por ${rupias(j)}.`);
+}
+
+function cambiarCamellos(j, delta) {
+  guardarParaDeshacer();
+  const t = estado.partida.tomado[j];
+  t.camellos = Math.max(0, t.camellos + delta);
+  persistir();
+  pintar();
+  anunciar(`${JUGADORAS[j]} tiene ${t.camellos} camellos.`);
+}
+
+/* =================================================================
+   Recuento de la ronda
+   ================================================================= */
+
+/** Desglose de una jugadora suponiendo que `ganadorCamellos` se lleva la ficha. */
+function desglose(j, ganadorCamellos) {
+  const t = estado.partida.tomado[j];
+  const camello = ganadorCamellos === j ? CAMELLO : 0;
+  return {
+    mercancias: suma(t.mercancias),
+    numMercancias: t.mercancias.length,
+    bonus: suma(t.bonus),
+    numBonus: t.bonus.length,
+    camello,
+    total: suma(t.mercancias) + suma(t.bonus) + camello
+  };
+}
+
+/**
+ * Quién gana la ronda. Desempates del reglamento, en orden: más rupias, más
+ * fichas de bonus y más fichas de mercancía. Si sigue empatado (rarísimo) el
+ * reglamento se acaba y devuelve null para que lo decidan ellas.
+ */
+function ganadoraRonda(a, b) {
+  if (a.total !== b.total) return { j: a.total > b.total ? 0 : 1, porque: 'por rupias' };
+  if (a.numBonus !== b.numBonus) {
+    return { j: a.numBonus > b.numBonus ? 0 : 1, porque: 'empate a rupias, gana por fichas de bonus' };
+  }
+  if (a.numMercancias !== b.numMercancias) {
+    return { j: a.numMercancias > b.numMercancias ? 0 : 1, porque: 'empate a rupias y a bonus, gana por fichas de mercancía' };
+  }
+  return null;
+}
+
+function cerrarRonda(ganadorCamellos, ganadoraForzada) {
+  const a = desglose(0, ganadorCamellos);
+  const b = desglose(1, ganadorCamellos);
+  const veredicto = ganadoraRonda(a, b);
+  const ganadora = ganadoraForzada != null ? ganadoraForzada : (veredicto ? veredicto.j : null);
+
+  guardarParaDeshacer();
+  const p = estado.partida;
+  p.rondas.push({ puntos: [a.total, b.total], detalle: [a, b], ganadora });
+  if (ganadora != null) p.sellos[ganadora] += 1;
+
+  const finDePartida = p.sellos.some(s => s >= SELLOS_PARA_GANAR);
+  if (finDePartida) {
+    const campeona = p.sellos[0] > p.sellos[1] ? 0 : 1;
+    estado.historial.unshift({
+      fecha: new Date().toISOString(),
+      rondas: p.rondas,
+      sellos: p.sellos.slice(),
+      ganadora: campeona
+    });
+    estado.partida = partidaNueva();
+    persistir();
+    pintar();
+    mostrarFinDePartida(campeona);
+  } else {
+    p.ronda += 1;
+    Object.assign(p, rondaNueva());
+    persistir();
+    pintar();
+    anunciar(`Empieza la ronda ${p.ronda}.`);
+  }
+}
+
+/* =================================================================
+   Pintado
+   ================================================================= */
+
+const $ = sel => document.querySelector(sel);
+
+function pintar() {
+  const p = estado.partida;
+  $('#etiqueta-ronda').textContent = `Ronda ${p.ronda}`;
+
+  const lider = lideraCamellos();
+  for (const j of [0, 1]) {
+    $(`#rupias-${j}`).textContent = rupias(j);
+    $(`#camellos-${j}`).textContent = p.tomado[j].camellos;
+
+    const sellos = $(`#sellos-${j}`);
+    sellos.innerHTML = '';
+    for (let i = 0; i < SELLOS_PARA_GANAR; i++) {
+      const s = document.createElement('span');
+      s.className = 'sello' + (i < p.sellos[j] ? ' ganado' : '');
+      sellos.appendChild(s);
+    }
+    sellos.setAttribute('aria-label', `Sellos de ${JUGADORAS[j]}: ${p.sellos[j]} de ${SELLOS_PARA_GANAR}`);
+
+    // Quien va ganando en camellos se lleva 5 rupias al cerrar la ronda: se avisa antes.
+    const marca = $(`.btn-camellos[data-camellos="${j}"] .lidera`);
+    if (marca) marca.remove();
+    if (lider === j) {
+      const etiqueta = document.createElement('span');
+      etiqueta.className = 'lidera';
+      etiqueta.textContent = '+5';
+      $(`.btn-camellos[data-camellos="${j}"]`).appendChild(etiqueta);
+    }
+  }
+
+  pintarMontones();
+
+  const agotados = montonesAgotados();
+  const aviso = $('#aviso-fin');
+  aviso.hidden = !rondaTerminada();
+  if (!aviso.hidden) {
+    $('#aviso-texto').textContent = `Se han agotado ${agotados} mercancías: la ronda termina aquí.`;
+  }
+
+  $('#btn-deshacer').disabled = pilaDeshacer.length === 0;
+}
+
+function pintarMontones() {
+  const lista = $('#montones');
+  lista.innerHTML = '';
+  for (const m of MERCANCIAS) {
+    const restantes = estado.partida.montones[m.id];
+    const li = document.createElement('li');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'monton' + (restantes.length ? '' : ' agotado');
+    btn.dataset.mercancia = m.id;
+    btn.setAttribute('aria-label',
+      `Vender ${m.nombre.toLowerCase()}. Quedan ${restantes.length} fichas` +
+      (restantes.length ? `, la siguiente vale ${restantes[0]} rupias.` : '.'));
+
+    const cabeza = document.createElement('span');
+    cabeza.className = 'monton-cabeza';
+    cabeza.innerHTML = `<span aria-hidden="true">${m.emoji}</span><span>${m.nombre}</span>` +
+      `<span class="restantes">${restantes.length}/${m.fichas.length}</span>`;
+    btn.appendChild(cabeza);
+
+    const fichas = document.createElement('span');
+    fichas.className = 'fichas';
+    if (restantes.length) {
+      restantes.forEach((v, i) => {
+        const f = document.createElement('span');
+        f.className = 'ficha' + (i === 0 ? ' siguiente' : '');
+        f.textContent = v;
+        fichas.appendChild(f);
+      });
+    } else {
+      const vacio = document.createElement('span');
+      vacio.className = 'agotado-txt';
+      vacio.textContent = 'Agotada';
+      fichas.appendChild(vacio);
+    }
+    btn.appendChild(fichas);
+
+    li.appendChild(btn);
+    lista.appendChild(li);
+  }
+}
+
+function anunciar(texto) { $('#anuncio').textContent = texto; }
+
+/* =================================================================
+   Diálogos
+   ================================================================= */
+
+function abrir(dlg, html) {
+  dlg.innerHTML = html;
+  dlg.showModal();
+}
+
+function cerrarTodo() {
+  document.querySelectorAll('dialog[open]').forEach(d => d.close());
+}
+
+/* --- Venta ------------------------------------------------------ */
+
+let ventaEnCurso = null;
+
+function abrirVenta(idMercancia) {
+  const m = mercancia(idMercancia);
+  const minimo = m.preciosa ? 2 : 1;
+  ventaEnCurso = { mercancia: idMercancia, cantidad: minimo };
+
+  const opciones = [];
+  for (let n = 1; n <= maximoVendible(m); n++) {
+    const bloqueada = n < minimo;
+    opciones.push(
+      `<button type="button" class="opcion" data-cantidad="${n}" ${bloqueada ? 'disabled' : ''}
+         aria-pressed="${n === minimo}">
+         <span>${n}</span><span class="pista" data-pista="${n}"></span>
+       </button>`);
+  }
+
+  abrir($('#dlg-venta'), `
+    <h2 id="venta-titulo"><span aria-hidden="true">${m.emoji}</span> Vender ${m.nombre.toLowerCase()}</h2>
+    <p class="sub" id="venta-sub"></p>
+    <fieldset>
+      <legend>¿Cuántas cartas?</legend>
+      <div class="opciones">${opciones.join('')}</div>
+    </fieldset>
+    <fieldset>
+      <legend>¿Quién vende?</legend>
+      <div class="acciones">
+        <button type="button" class="btn simi" data-vende="0">${JUGADORAS[0]}</button>
+        <button type="button" class="btn ines" data-vende="1">${JUGADORAS[1]}</button>
+      </div>
+    </fieldset>
+    <button type="button" class="enlace-sutil" data-cerrar>Cancelar</button>
+  `);
+
+  actualizarVenta();
+}
+
+function actualizarVenta() {
+  const { mercancia: id, cantidad } = ventaEnCurso;
+  const m = mercancia(id);
+
+  for (let n = 1; n <= maximoVendible(m); n++) {
+    const pista = document.querySelector(`#dlg-venta [data-pista="${n}"]`);
+    if (!pista) continue;
+    const valor = suma(fichasQueSeLleva(id, n));
+    const nivel = nivelBonus(n);
+    pista.textContent = nivel ? `${valor}+b` : `${valor}`;
+  }
+
+  const llevadas = fichasQueSeLleva(id, cantidad);
+  const nivel = nivelBonus(cantidad);
+  let texto = llevadas.length
+    ? `Se lleva ${llevadas.join(' + ')} = ${suma(llevadas)} rupias`
+    : 'El montón está agotado: no se lleva ninguna ficha de mercancía';
+  if (nivel) {
+    texto += `, más una ficha de bonus de ${BONUS[nivel].valores.join('/')}`;
+  }
+  if (llevadas.length < cantidad && llevadas.length) {
+    texto += ` (solo quedaban ${llevadas.length} fichas)`;
+  }
+  $('#venta-sub').textContent = texto + '.';
+}
+
+function confirmarVenta(j) {
+  const { mercancia: id, cantidad } = ventaEnCurso;
+  const nivel = nivelBonus(cantidad);
+  $('#dlg-venta').close();
+
+  if (!nivel) {
+    registrarVenta(j, id, cantidad, 0);
+    return;
+  }
+  abrirBonus(j, id, cantidad, nivel);
+}
+
+/* --- Ficha de bonus --------------------------------------------- */
+
+function abrirBonus(j, idMercancia, cantidad, nivel) {
+  const quedan = estado.partida.bonusRestantes[nivel];
+  const botones = BONUS[nivel].valores
+    .map(v => `<button type="button" class="opcion" data-bonus="${v}"><span>${v}</span></button>`)
+    .join('');
+
+  abrir($('#dlg-bonus'), `
+    <h2 id="bonus-titulo">Ficha de bonus</h2>
+    <p class="sub">${JUGADORAS[j]} vende ${cantidad} cartas, así que coge una ficha del montón de
+      ${nivel === 5 ? '5 o más' : nivel}. Dale la vuelta y marca cuánto vale.
+      ${quedan ? `Quedan ${quedan}.` : 'Ese montón ya estaba vacío.'}</p>
+    <fieldset>
+      <legend>¿Cuánto vale?</legend>
+      <div class="opciones">${botones}</div>
+    </fieldset>
+    <button type="button" class="enlace-sutil" data-bonus="0">No queda ninguna ficha de ese montón</button>
+  `);
+
+  $('#dlg-bonus').dataset.venta = JSON.stringify({ j, idMercancia, cantidad });
+}
+
+/* --- Camellos ---------------------------------------------------- */
+
+function abrirCamellos(j) {
+  const actual = estado.partida.tomado[j].camellos;
+  const mas = [1, 2, 3, 4, 5]
+    .map(n => `<button type="button" class="opcion" data-camello-delta="${n}"><span>+${n}</span></button>`)
+    .join('');
+
+  abrir($('#dlg-camellos'), `
+    <h2 id="camellos-titulo"><span aria-hidden="true">🐫</span> Camellos de ${JUGADORAS[j]}</h2>
+    <p class="sub">Ahora mismo tiene <strong>${actual}</strong>. Quien acabe la ronda con más se lleva
+      la ficha de camellos, que vale ${CAMELLO} rupias.</p>
+    <fieldset>
+      <legend>Coge del mercado</legend>
+      <div class="opciones">${mas}</div>
+    </fieldset>
+    <div class="acciones">
+      <button type="button" class="btn" data-camello-delta="-1">−1</button>
+      <button type="button" class="btn" data-camello-cero>Poner a 0</button>
+    </div>
+    <button type="button" class="enlace-sutil" data-cerrar>Listo</button>
+  `);
+
+  $('#dlg-camellos').dataset.jugadora = String(j);
+}
+
+/* --- Recuento de la ronda ---------------------------------------- */
+
+let camellosElegidos = null;
+
+function abrirRecuento() {
+  camellosElegidos = lideraCamellos();
+  pintarRecuento();
+  $('#dlg-ronda').showModal();
+}
+
+function pintarRecuento() {
+  const p = estado.partida;
+  const a = desglose(0, camellosElegidos);
+  const b = desglose(1, camellosElegidos);
+  const veredicto = ganadoraRonda(a, b);
+
+  const opcionCamellos = [0, 1, -1].map(v => `
+    <button type="button" class="opcion" data-camellos-ganadora="${v}" aria-pressed="${camellosElegidos === v}">
+      <span>${v === -1 ? 'Empate' : JUGADORAS[v]}</span>
+      <span class="pista">${v === -1 ? 'nadie se la lleva' : `${p.tomado[v].camellos} camellos`}</span>
+    </button>`).join('');
+
+  let bloqueVeredicto;
+  if (veredicto) {
+    bloqueVeredicto = `
+      <div class="veredicto">
+        <p class="quien">Gana la ronda ${JUGADORAS[veredicto.j]} 🎉</p>
+        <p class="porque">${veredicto.porque} · se lleva un sello de excelencia</p>
+      </div>
+      <div class="acciones">
+        <button type="button" class="btn principal" data-cerrar-ronda="${veredicto.j}">
+          ${p.sellos[veredicto.j] + 1 >= SELLOS_PARA_GANAR ? 'Ganar la partida' : 'Siguiente ronda'}
+        </button>
+      </div>`;
+  } else {
+    // El reglamento no llega hasta aquí: empate en rupias, en bonus y en fichas.
+    bloqueVeredicto = `
+      <div class="veredicto">
+        <p class="quien">Empate absoluto</p>
+        <p class="porque">Mismas rupias, mismas fichas de bonus y mismas de mercancía.
+          El reglamento no lo resuelve, así que lo decidís vosotras.</p>
+      </div>
+      <div class="acciones">
+        <button type="button" class="btn simi" data-cerrar-ronda="0">Sello para ${JUGADORAS[0]}</button>
+        <button type="button" class="btn ines" data-cerrar-ronda="1">Sello para ${JUGADORAS[1]}</button>
+      </div>
+      <button type="button" class="enlace-sutil" data-cerrar-ronda="ninguna">Ronda sin sello</button>`;
+  }
+
+  abrirContenido($('#dlg-ronda'), `
+    <h2 id="ronda-titulo">Recuento de la ronda ${p.ronda}</h2>
+    <p class="sub">Comprueba que cuadra con lo que tienes en la mesa antes de cerrarla.</p>
+
+    <fieldset>
+      <legend>¿Quién tiene más camellos?</legend>
+      <div class="opciones">${opcionCamellos}</div>
+    </fieldset>
+
+    <table class="recuento">
+      <caption>Rupias de la ronda</caption>
+      <thead>
+        <tr><th scope="col"><span class="visualmente-oculta">Concepto</span></th>
+            <th scope="col">${JUGADORAS[0]}</th><th scope="col">${JUGADORAS[1]}</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Mercancías (${a.numMercancias} y ${b.numMercancias} fichas)</th>
+            <td>${a.mercancias}</td><td>${b.mercancias}</td></tr>
+        <tr><th scope="row">Bonus (${a.numBonus} y ${b.numBonus} fichas)</th>
+            <td>${a.bonus}</td><td>${b.bonus}</td></tr>
+        <tr><th scope="row">Camellos</th><td>${a.camello}</td><td>${b.camello}</td></tr>
+        <tr class="total"><th scope="row">Total</th><td>${a.total}</td><td>${b.total}</td></tr>
+      </tbody>
+    </table>
+
+    ${bloqueVeredicto}
+    <button type="button" class="enlace-sutil" data-cerrar>Volver a la partida</button>
+  `);
+}
+
+/** Sustituye el contenido de un diálogo que ya puede estar abierto, sin cerrarlo. */
+function abrirContenido(dlg, html) { dlg.innerHTML = html; }
+
+/* --- Fin de partida ---------------------------------------------- */
+
+function mostrarFinDePartida(campeona) {
+  const stats = estadisticas();
+  abrir($('#dlg-ronda'), `
+    <h2 id="ronda-titulo">¡Gana ${JUGADORAS[campeona]}! 🏆</h2>
+    <p class="sub">Dos sellos de excelencia. Queda guardado en el cara a cara.</p>
+    <div class="duelo">
+      <div><span class="cifra simi">${stats.partidas[0]}</span><span class="quien">${JUGADORAS[0]}</span></div>
+      <span class="vs">partidas</span>
+      <div><span class="cifra ines">${stats.partidas[1]}</span><span class="quien">${JUGADORAS[1]}</span></div>
+    </div>
+    <div class="acciones">
+      <button type="button" class="btn principal" data-cerrar>Otra partida</button>
+      <button type="button" class="btn" data-abrir-stats>Estadísticas</button>
+    </div>
+  `);
+  celebrar();
+}
+
+function celebrar() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const capa = document.createElement('div');
+  capa.className = 'confeti';
+  capa.setAttribute('aria-hidden', 'true');
+  // Un <dialog> modal vive en la top layer: el confeti tiene que colgar de él o
+  // el fondo oscuro del propio diálogo lo tapa entero.
+  const anfitrion = document.querySelector('dialog[open]') || document.body;
+  const colores = ['#e23e6b', '#f79d2e', '#00897b', '#f2c14e', '#c2185b'];
+  for (let i = 0; i < 40; i++) {
+    const trozo = document.createElement('i');
+    trozo.style.left = Math.random() * 100 + '%';
+    trozo.style.background = colores[i % colores.length];
+    trozo.style.animationDuration = (1.6 + Math.random() * 1.4) + 's';
+    trozo.style.animationDelay = (Math.random() * .5) + 's';
+    capa.appendChild(trozo);
+  }
+  anfitrion.appendChild(capa);
+  setTimeout(() => capa.remove(), 3600);
+}
+
+/* =================================================================
+   Estadísticas del cara a cara
+   ================================================================= */
+
+function estadisticas() {
+  const h = estado.historial;
+  const s = {
+    total: h.length,
+    partidas: [0, 0],
+    rondas: [0, 0],
+    rupiasTotal: [0, 0],
+    rondasJugadas: 0,
+    racha: null,
+    mejorRacha: [0, 0],
+    record: null,
+    paliza: null
+  };
+
+  for (const partida of h) {
+    s.partidas[partida.ganadora] += 1;
+    for (const r of partida.rondas) {
+      s.rondasJugadas += 1;
+      if (r.ganadora != null) s.rondas[r.ganadora] += 1;
+      for (const j of [0, 1]) s.rupiasTotal[j] += r.puntos[j];
+
+      const dif = Math.abs(r.puntos[0] - r.puntos[1]);
+      if (!s.paliza || dif > s.paliza.dif) {
+        s.paliza = { dif, j: r.puntos[0] > r.puntos[1] ? 0 : 1, fecha: partida.fecha };
+      }
+      for (const j of [0, 1]) {
+        if (!s.record || r.puntos[j] > s.record.puntos) {
+          s.record = { puntos: r.puntos[j], j, fecha: partida.fecha };
+        }
+      }
+    }
+  }
+
+  // El historial se guarda con la más reciente delante, así que la racha se lee desde el principio.
+  if (h.length) {
+    const quien = h[0].ganadora;
+    let cuantas = 0;
+    for (const partida of h) {
+      if (partida.ganadora !== quien) break;
+      cuantas += 1;
+    }
+    s.racha = { j: quien, cuantas };
+  }
+
+  for (const j of [0, 1]) {
+    let actual = 0;
+    for (const partida of h) {
+      actual = partida.ganadora === j ? actual + 1 : 0;
+      if (actual > s.mejorRacha[j]) s.mejorRacha[j] = actual;
+    }
+  }
+
+  s.media = s.rondasJugadas
+    ? [0, 1].map(j => Math.round(s.rupiasTotal[j] / s.rondasJugadas))
+    : [0, 0];
+
+  return s;
+}
+
+function fechaCorta(iso) {
+  return new Date(iso).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function abrirEstadisticas() {
+  const s = estadisticas();
+
+  if (!s.total) {
+    abrir($('#dlg-stats'), `
+      <h2 id="stats-titulo">El cara a cara</h2>
+      <p class="vacio">Todavía no habéis terminado ninguna partida.<br>En cuanto alguna llegue a dos sellos, esto se llena.</p>
+      <button type="button" class="btn principal" data-cerrar>Volver</button>
+    `);
+    return;
+  }
+
+  const filas = [
+    ['Rondas ganadas', `${s.rondas[0]} — ${s.rondas[1]}`],
+    ['Media de rupias por ronda', `${s.media[0]} — ${s.media[1]}`],
+    ['Racha actual', s.racha.cuantas > 1
+      ? `${JUGADORAS[s.racha.j]}, ${s.racha.cuantas} seguidas`
+      : `${JUGADORAS[s.racha.j]}, la última partida`],
+    ['Mejor racha', `${s.mejorRacha[0]} — ${s.mejorRacha[1]}`],
+    ['Récord de rupias en una ronda', `${s.record.puntos}, ${JUGADORAS[s.record.j]} · ${fechaCorta(s.record.fecha)}`],
+    ['Mayor paliza', `${s.paliza.dif} de diferencia, ${JUGADORAS[s.paliza.j]} · ${fechaCorta(s.paliza.fecha)}`],
+    ['Partidas jugadas', String(s.total)],
+    ['Última partida', fechaCorta(estado.historial[0].fecha)]
+  ];
+
+  abrir($('#dlg-stats'), `
+    <h2 id="stats-titulo">El cara a cara</h2>
+    <p class="sub">Todo lo que habéis jugado desde que existe esta app.</p>
+    <div class="duelo">
+      <div><span class="cifra simi">${s.partidas[0]}</span><span class="quien">${JUGADORAS[0]}</span></div>
+      <span class="vs">partidas<br>ganadas</span>
+      <div><span class="cifra ines">${s.partidas[1]}</span><span class="quien">${JUGADORAS[1]}</span></div>
+    </div>
+    <ul class="datos">
+      ${filas.map(([k, v]) => `<li><span class="etiqueta">${k}</span><span class="valor">${v}</span></li>`).join('')}
+    </ul>
+    <button type="button" class="btn principal" data-cerrar>Volver</button>
+    <button type="button" class="enlace-sutil" data-borrar-historial>Borrar el historial</button>
+  `);
+}
+
+/* =================================================================
+   Menú y reglas
+   ================================================================= */
+
+function abrirMenu() {
+  abrir($('#dlg-menu'), `
+    <h2 id="menu-titulo">Menú</h2>
+    <p class="sub">Ronda ${estado.partida.ronda} · sellos ${estado.partida.sellos[0]}—${estado.partida.sellos[1]}</p>
+    <div class="acciones" style="flex-direction:column">
+      <button type="button" class="btn" data-abrir-stats>📊 Estadísticas</button>
+      <button type="button" class="btn" data-abrir-reglas>📖 Cómo se puntúa</button>
+      <button type="button" class="btn" data-nueva-partida>🔄 Empezar otra partida</button>
+    </div>
+    <button type="button" class="enlace-sutil" data-cerrar>Cerrar</button>
+  `);
+}
+
+function abrirReglas() {
+  const filas = MERCANCIAS
+    .map(m => `<tr><th scope="row">${m.emoji} ${m.nombre}</th><td>${m.fichas.join(' · ')}</td></tr>`)
+    .join('');
+
+  abrir($('#dlg-reglas'), `
+    <h2 id="reglas-titulo">Cómo se puntúa</h2>
+    <p class="sub">La chuleta, por si hay discusión en mitad de la partida.</p>
+    <table class="tabla-reglas">
+      <caption class="visualmente-oculta">Valor de las fichas de cada mercancía, de la primera a la última</caption>
+      <tbody>${filas}</tbody>
+    </table>
+    <ul class="reglas-texto">
+      <li><strong>Bonus:</strong> vender 3 da 1/2/3 · vender 4 da 4/5/6 · vender 5 o más da 8/9/10.</li>
+      <li><strong>Camellos:</strong> quien acabe con más se lleva ${CAMELLO} rupias.</li>
+      <li><strong>Diamantes, oro y plata</strong> solo se pueden vender de dos en dos como mínimo.</li>
+      <li><strong>La ronda acaba</strong> al agotarse 3 montones de mercancía, o al quedarse el mazo
+        sin cartas para reponer el mercado.</li>
+      <li><strong>Empates:</strong> gana quien tenga más fichas de bonus; si sigue, más fichas de mercancía.</li>
+      <li><strong>La partida</strong> es de quien consiga ${SELLOS_PARA_GANAR} sellos de excelencia.</li>
+    </ul>
+    <button type="button" class="btn principal" data-cerrar>Cerrar</button>
+  `);
+}
+
+function nuevaPartida() {
+  const p = estado.partida;
+  const empezada = p.ronda > 1 || p.rondas.length > 0 ||
+    p.tomado.some(t => t.mercancias.length || t.bonus.length || t.camellos);
+  if (empezada && !confirm('Hay una partida a medias. ¿Seguro que quieres empezar otra?')) return;
+
+  guardarParaDeshacer();
+  estado.partida = partidaNueva();
+  persistir();
+  pintar();
+  cerrarTodo();
+  anunciar('Partida nueva.');
+}
+
+/* =================================================================
+   Eventos
+   ================================================================= */
+
+document.addEventListener('click', ev => {
+  const t = ev.target.closest('button');
+  if (!t) return;
+
+  // --- Cerrar cualquier diálogo
+  if (t.hasAttribute('data-cerrar')) {
+    t.closest('dialog').close();
+    return;
+  }
+
+  // --- Montones
+  const monton = t.closest('.monton');
+  if (monton) { abrirVenta(monton.dataset.mercancia); return; }
+
+  // --- Venta: cantidad
+  if (t.dataset.cantidad) {
+    ventaEnCurso.cantidad = Number(t.dataset.cantidad);
+    document.querySelectorAll('#dlg-venta [data-cantidad]')
+      .forEach(b => b.setAttribute('aria-pressed', String(b === t)));
+    actualizarVenta();
+    return;
+  }
+
+  // --- Venta: quién vende
+  if (t.dataset.vende) { confirmarVenta(Number(t.dataset.vende)); return; }
+
+  // --- Bonus
+  if (t.hasAttribute('data-bonus')) {
+    const dlg = $('#dlg-bonus');
+    const { j, idMercancia, cantidad } = JSON.parse(dlg.dataset.venta);
+    dlg.close();
+    registrarVenta(j, idMercancia, cantidad, Number(t.dataset.bonus));
+    return;
+  }
+
+  // --- Camellos
+  if (t.dataset.camellos) { abrirCamellos(Number(t.dataset.camellos)); return; }
+  if (t.dataset.camelloDelta) {
+    cambiarCamellos(Number($('#dlg-camellos').dataset.jugadora), Number(t.dataset.camelloDelta));
+    $('#dlg-camellos').close();
+    return;
+  }
+  if (t.hasAttribute('data-camello-cero')) {
+    const j = Number($('#dlg-camellos').dataset.jugadora);
+    cambiarCamellos(j, -estado.partida.tomado[j].camellos);
+    $('#dlg-camellos').close();
+    return;
+  }
+
+  // --- Recuento
+  if (t.dataset.camellosGanadora) {
+    camellosElegidos = Number(t.dataset.camellosGanadora);
+    pintarRecuento();
+    // Repintar el diálogo entero destruye el botón que se acaba de pulsar y con él
+    // el foco; sin esto, quien navegue con teclado o lector vuelve al principio.
+    const mismo = $(`#dlg-ronda [data-camellos-ganadora="${camellosElegidos}"]`);
+    if (mismo) mismo.focus();
+    return;
+  }
+  if (t.dataset.cerrarRonda) {
+    const valor = t.dataset.cerrarRonda;
+    $('#dlg-ronda').close();
+    cerrarRonda(camellosElegidos, valor === 'ninguna' ? null : Number(valor));
+    return;
+  }
+
+  // --- Menú
+  if (t.hasAttribute('data-abrir-stats')) { cerrarTodo(); abrirEstadisticas(); return; }
+  if (t.hasAttribute('data-abrir-reglas')) { cerrarTodo(); abrirReglas(); return; }
+  if (t.hasAttribute('data-nueva-partida')) { nuevaPartida(); return; }
+  if (t.hasAttribute('data-borrar-historial')) {
+    if (!confirm('Se borra el cara a cara entero y no se puede recuperar. ¿Seguro?')) return;
+    estado.historial = [];
+    persistir();
+    cerrarTodo();
+    anunciar('Historial borrado.');
+    return;
+  }
+});
+
+$('#btn-menu').addEventListener('click', abrirMenu);
+$('#btn-deshacer').addEventListener('click', deshacer);
+$('#btn-contar').addEventListener('click', abrirRecuento);
+$('#btn-fin-ronda').addEventListener('click', () => {
+  if (rondaTerminada() || confirm('¿Se acabó el mazo y con él la ronda?')) abrirRecuento();
+});
+
+// Los <dialog> se cierran con Escape sin avisar: hay que soltar el estado a medias.
+document.querySelectorAll('dialog').forEach(d => {
+  d.addEventListener('close', () => { if (d.id === 'dlg-venta') ventaEnCurso = null; });
+});
+
+/* =================================================================
+   Arranque
+   ================================================================= */
+
+pintar();
+
+// Sin conexión también se juega: el service worker guarda la app entera.
+// Solo se registra sobre http(s); abriendo el archivo con file:// daría error.
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => { /* sin caché offline, la app funciona igual */ });
+  });
+}
+</script>
+</body>
+</html>
