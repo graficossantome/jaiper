@@ -17,7 +17,14 @@ Sin dependencias, sin servidor y sin cuentas. Un HTML, un service worker y tres 
 - **La ronda termina sola** al agotarse tres montones. Si se acaba antes el mazo, está el botón de
   abajo.
 - **Deshacer** revierte la última acción, tantas veces como haga falta dentro de la partida.
-- El menú `⋯` tiene las estadísticas, la chuleta de puntuación y el botón de partida nueva.
+- El menú `···` tiene las estadísticas, el historial de partidas, la copia de seguridad, la chuleta
+  de puntuación y el botón de partida nueva.
+
+## Copia de seguridad
+
+El historial vive solo en el navegador del teléfono. Desde el menú se descarga un `.json` con todo
+lo jugado y se vuelve a cargar en otro sitio. Importar **suma** en vez de reemplazar: descarta por
+fecha las partidas que ya estén y añade el resto, para poder juntar lo jugado en dos teléfonos.
 
 ## Instalarla en el móvil
 
@@ -27,8 +34,9 @@ pantalla completa, con su icono, y funciona sin conexión.
 
 ## Dónde se guarda todo
 
-En el `localStorage` del navegador del teléfono que lleva la cuenta. No hay servidor ni copia: si
-se borran los datos del navegador o se cambia de móvil, el historial se pierde.
+En el `localStorage` del navegador del teléfono que lleva la cuenta. No hay servidor: si se borran
+los datos del navegador o se cambia de móvil, el historial se va con ellos, y la única red de
+seguridad es la copia que se descarga a mano.
 
 ## Archivos
 

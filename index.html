@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Jaipur · Simi e Inés</title>
 <meta name="description" content="Marcador de Jaipur para las partidas de Simi e Inés: sigue las ventas, cuenta las rupias y guarda el cara a cara.">
-<meta name="theme-color" content="#fff8f0" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1a1210" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#fbf6ee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16100e" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icono-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="icono-180.png">
@@ -15,46 +15,45 @@
 <meta name="mobile-web-app-capable" content="yes">
 <style>
 /* ---------------------------------------------------------------
-   Paleta: la ciudad rosa y las especias. Simi va en fucsia e Inés
-   en jade; los dos colores pasan AA sobre sus fondos en los dos temas.
+   Paleta de papel e tinta: el fondo es papel cálido, no un gris de
+   panel, y las superficies se separan con filete de 1px en vez de
+   con sombra. Simi va en fucsia e Inés en jade; los dos pasan AA
+   sobre su fondo en los dos temas.
    --------------------------------------------------------------- */
 :root {
   color-scheme: light dark;
 
-  --fondo: #fff8f0;
-  --tarjeta: #ffffff;
-  --tarjeta-hundida: #fdf0e4;
-  --borde: #efdccb;
-  --texto: #2b1b16;
-  --tenue: #75584c;
-  --simi: #c2185b;
-  --simi-suave: #fde7ef;
-  --ines: #00695c;
-  --ines-suave: #e0f2ef;
-  --oro: #9a5b00;
-  --oro-suave: #fdf0d9;
+  --papel: #fbf6ee;
+  --papel-alto: #ffffff;
+  --papel-hundido: #f4ebde;
+  --linea: #e0d1bf;
+  --linea-fuerte: #cbb59d;
+  --tinta: #241813;
+  --tinta-suave: #6d5749;
+  --simi: #b02a5b;
+  --ines: #0f6b5c;
+  --oro: #9c6a12;
   --foco: #0b57d0;
 
-  --radio: 16px;
-  --radio-s: 10px;
-  --sombra: 0 1px 2px rgba(74, 38, 20, .08), 0 6px 16px rgba(74, 38, 20, .06);
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --sans: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --radio: 18px;
   --transicion: 140ms ease;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --fondo: #1a1210;
-    --tarjeta: #251a17;
-    --tarjeta-hundida: #2f211d;
-    --borde: #43302a;
-    --texto: #f7eae1;
-    --tenue: #c2a99e;
-    --simi: #ff8fb1;
-    --simi-suave: #3d1d2a;
-    --ines: #5fd6c0;
-    --ines-suave: #123330;
-    --oro: #f0b95e;
-    --oro-suave: #3a2a13;
+    --papel: #16100e;
+    --papel-alto: #211815;
+    --papel-hundido: #1d1512;
+    --linea: #3b2c25;
+    --linea-fuerte: #564137;
+    --tinta: #f3e7dc;
+    --tinta-suave: #b9a294;
+    --simi: #ff9db8;
+    --ines: #63d8c1;
+    --oro: #e0ae5b;
     --foco: #9ec2ff;
   }
 }
@@ -63,27 +62,19 @@
 
 body {
   margin: 0;
-  padding: 0 max(12px, env(safe-area-inset-left)) calc(84px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-right));
-  background: var(--fondo);
-  color: var(--texto);
-  font-family: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  padding: 0 max(14px, env(safe-area-inset-left)) calc(112px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-right));
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: var(--sans);
   font-size: 17px;
-  line-height: 1.4;
+  line-height: 1.45;
   -webkit-text-size-adjust: 100%;
   overscroll-behavior-y: contain;
 }
 
-h1, h2, h3 { line-height: 1.15; margin: 0; }
+h1, h2, h3 { line-height: 1.15; margin: 0; font-family: var(--serif); font-weight: 600; }
 
-button {
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-  border: 0;
-  background: none;
-  /* 44px es el mínimo táctil de WCAG; casi todo aquí se pulsa a una mano y con prisa */
-  min-height: 44px;
-}
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
 
 :focus-visible {
   outline: 3px solid var(--foco);
@@ -100,90 +91,111 @@ button {
   white-space: nowrap;
 }
 
-/* --- Cabecera ------------------------------------------------- */
+/* --- Cabecera: celosía de Jaipur ------------------------------- */
 
 .cabecera {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 -14px 14px;
+  padding: max(14px, calc(env(safe-area-inset-top) + 6px)) 18px 14px;
+  border-bottom: 1px solid var(--linea);
+  overflow: hidden;
+}
+
+/* Celosía de círculos entrelazados, el jaali de las ventanas de Jaipur.
+   Va en el fondo de la cabecera y se desvanece hacia la derecha. */
+.cabecera::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cg fill='none' stroke='%23b02a5b' stroke-width='1'%3E%3Ccircle cx='0' cy='0' r='15.5'/%3E%3Ccircle cx='44' cy='0' r='15.5'/%3E%3Ccircle cx='0' cy='44' r='15.5'/%3E%3Ccircle cx='44' cy='44' r='15.5'/%3E%3Ccircle cx='22' cy='22' r='15.5'/%3E%3C/g%3E%3C/svg%3E");
+  opacity: .16;
+  mask-image: linear-gradient(100deg, #000 0%, transparent 62%);
+  pointer-events: none;
+}
+
+.cabecera > * { position: relative; }
+
+.cabecera h1 {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: max(10px, env(safe-area-inset-top)) 4px 8px;
+  font-size: 1.5rem;
+  letter-spacing: -.015em;
 }
 
-.cabecera h1 {
-  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  font-size: 1.32rem;
-  font-weight: 600;
-  letter-spacing: -.01em;
-}
+.corazon { width: 17px; height: 17px; fill: var(--simi); }
 
-.cabecera .ronda {
-  margin: 0;
-  margin-inline-start: auto;
-  font-size: .82rem;
-  font-weight: 600;
-  color: var(--tenue);
-  background: var(--tarjeta);
-  border: 1px solid var(--borde);
-  border-radius: 999px;
-  padding: 5px 12px;
+.ronda {
+  margin: 0 0 0 auto;
+  font-family: var(--serif);
+  font-size: .92rem;
+  font-style: italic;
+  color: var(--tinta-suave);
 }
 
 .btn-icono {
   display: grid;
   place-items: center;
   min-width: 44px;
-  border-radius: 999px;
-  font-size: 1.15rem;
-  background: var(--tarjeta);
-  border: 1px solid var(--borde);
+  min-height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--linea);
+  font-size: 1.1rem;
+  letter-spacing: .1em;
 }
 
-/* --- Marcador ------------------------------------------------- */
+/* --- Marcador: un bloque partido, no dos tarjetas flotando ----- */
 
 .marcador {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.jugadora {
-  background: var(--tarjeta);
-  border: 1px solid var(--borde);
-  border-top: 4px solid var(--color-j);
+  border: 1px solid var(--linea);
   border-radius: var(--radio);
-  box-shadow: var(--sombra);
-  padding: 10px 12px 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  background: var(--papel-alto);
+  overflow: hidden;
 }
 
-.jugadora[data-j="0"] { --color-j: var(--simi); --suave-j: var(--simi-suave); }
-.jugadora[data-j="1"] { --color-j: var(--ines); --suave-j: var(--ines-suave); }
+.jugadora { padding: 12px 14px 10px; }
+.jugadora[data-j="0"] { --color-j: var(--simi); }
+.jugadora[data-j="1"] { --color-j: var(--ines); border-left: 1px solid var(--linea); }
 
 .jugadora h2 {
-  font-size: .95rem;
-  font-weight: 700;
+  font-size: 1.05rem;
   color: var(--color-j);
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  letter-spacing: .01em;
+}
+
+/* Filete doble bajo el nombre: el acento de color sin la barra superior de plantilla */
+.jugadora h2::after {
+  content: "";
+  display: block;
+  margin-top: 6px;
+  height: 3px;
+  border-top: 1px solid var(--color-j);
+  border-bottom: 1px solid var(--color-j);
+  opacity: .45;
 }
 
 .rupias {
-  margin: 0;
-  font-size: 2.5rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -.03em;
+  margin: 8px 0 0;
+  font-family: var(--serif);
+  font-size: 2.9rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 .rupias small {
-  font-size: .8rem;
+  font-family: var(--sans);
+  font-size: .72rem;
   font-weight: 600;
-  color: var(--tenue);
-  margin-inline-start: 4px;
-  letter-spacing: 0;
+  color: var(--tinta-suave);
+  margin-inline-start: 5px;
+  letter-spacing: .02em;
 }
 
 .pie-jugadora {
@@ -191,185 +203,228 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 6px;
-  margin-top: 4px;
+  margin-top: 10px;
 }
 
-.sellos { display: flex; gap: 4px; }
+.sellos { display: flex; gap: 5px; margin: 0; }
 
+/* Rombos, no círculos: rima con la gema del icono y con el tema del juego */
 .sello {
-  width: 15px; height: 15px;
-  border-radius: 50%;
-  border: 2px solid var(--color-j);
+  width: 11px;
+  height: 11px;
+  transform: rotate(45deg);
+  border: 1.5px solid var(--color-j);
+  opacity: .45;
 }
 
-.sello.ganado { background: var(--color-j); }
+.sello.ganado { background: var(--color-j); opacity: 1; }
 
-.btn-camellos {
+.btn-rebano {
   display: flex;
-  align-items: center;
-  gap: 4px;
-  background: var(--tarjeta-hundida);
-  border: 1px solid var(--borde);
-  border-radius: 999px;
-  padding: 4px 12px;
-  font-size: .9rem;
-  font-weight: 600;
+  align-items: baseline;
+  gap: 5px;
+  min-height: 44px;
+  padding: 0 4px;
+  font-size: .8rem;
+  color: var(--tinta-suave);
   font-variant-numeric: tabular-nums;
 }
 
-.btn-camellos .lidera {
-  color: var(--oro);
-  font-weight: 700;
-  font-size: .78rem;
+.btn-rebano b {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--tinta);
 }
 
-/* --- Aviso de fin de ronda ------------------------------------ */
+.btn-rebano .lidera { color: var(--oro); font-weight: 700; }
+
+/* --- Encabezados de sección con filete ------------------------- */
+
+.titulo-seccion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0 10px;
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--tinta-suave);
+  font-weight: 400;
+}
+
+.titulo-seccion::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--linea);
+}
+
+/* --- Aviso de fin de ronda ------------------------------------- */
 
 .aviso {
-  margin: 12px 0 0;
-  background: var(--oro-suave);
+  margin: 14px 0 0;
   border: 1px solid var(--oro);
   border-radius: var(--radio);
   padding: 12px 14px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
+  background: color-mix(in srgb, var(--oro) 9%, var(--papel));
 }
 
-.aviso p { margin: 0; flex: 1 1 140px; font-size: .93rem; font-weight: 600; }
+.aviso p { margin: 0; flex: 1 1 150px; font-size: .92rem; }
 .aviso[hidden] { display: none; }
 
-/* --- Montones ------------------------------------------------- */
-
-.titulo-seccion {
-  margin: 18px 0 8px;
-  font-size: .78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .07em;
-  color: var(--tenue);
-}
+/* --- Mercancías: filas, no rejilla de tarjetas ----------------- */
 
 .montones {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 10px;
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  background: var(--papel-alto);
+  overflow: hidden;
 }
+
+.montones li + li { border-top: 1px solid var(--linea); }
 
 .monton {
   width: 100%;
-  background: var(--tarjeta);
-  border: 1px solid var(--borde);
-  border-radius: var(--radio);
-  box-shadow: var(--sombra);
-  padding: 10px 12px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding: 10px 14px;
   text-align: start;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  transition: transform var(--transicion), box-shadow var(--transicion);
+  transition: background var(--transicion);
 }
 
-.monton:active { transform: scale(.975); }
+.monton:active { background: var(--papel-hundido); }
 
-.monton-cabeza {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  font-weight: 700;
-  font-size: .98rem;
+.marca {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--tono);
 }
 
-.monton-cabeza .restantes {
-  margin-inline-start: auto;
-  font-size: .74rem;
+.monton-nombre {
+  font-family: var(--serif);
+  font-size: 1.05rem;
   font-weight: 600;
-  color: var(--tenue);
-  font-variant-numeric: tabular-nums;
+  min-width: 4.9em;
 }
 
-.fichas { display: flex; flex-wrap: wrap; gap: 4px; }
+.fichas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-inline-start: auto;
+  justify-content: flex-end;
+}
 
+/* Las fichas son monedas: redondas, con su filete y su número tabular */
 .ficha {
-  min-width: 26px;
-  padding: 3px 6px;
-  border-radius: 8px;
-  background: var(--tarjeta-hundida);
-  border: 1px solid var(--borde);
-  color: var(--tenue);
-  font-size: .82rem;
-  font-weight: 700;
-  text-align: center;
+  width: 21px;
+  height: 21px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--linea-fuerte);
+  color: var(--tinta-suave);
+  font-size: .72rem;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
-/* La de arriba es la que se lleva la próxima venta: se destaca sola */
 .ficha.siguiente {
-  background: var(--oro-suave);
   border-color: var(--oro);
   color: var(--oro);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--oro) 20%, transparent);
 }
 
-.monton.agotado { opacity: .55; }
+.monton.agotado .marca { opacity: .3; }
+.monton.agotado .monton-nombre { color: var(--tinta-suave); }
 
-.monton .agotado-txt {
-  font-size: .82rem;
-  font-weight: 700;
-  color: var(--tenue);
+.agotado-txt {
+  margin-inline-start: auto;
+  font-size: .85rem;
+  font-style: italic;
+  color: var(--tinta-suave);
 }
 
-/* --- Barra inferior ------------------------------------------- */
+/* --- Bonus que queda ------------------------------------------- */
+
+.bonus-restante {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: .88rem;
+  color: var(--tinta-suave);
+}
+
+.bonus-restante b {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  color: var(--tinta);
+  margin-inline-start: 4px;
+}
+
+.bonus-restante li.vacia { opacity: .45; }
+.bonus-restante li.vacia b { text-decoration: line-through; }
+
+/* --- Barra inferior -------------------------------------------- */
 
 .barra {
   position: fixed;
   inset: auto 0 0 0;
   display: flex;
   gap: 10px;
-  padding: 10px max(12px, env(safe-area-inset-left)) calc(10px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-right));
-  background: color-mix(in srgb, var(--fondo) 88%, transparent);
+  padding: 10px max(14px, env(safe-area-inset-left)) calc(10px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-right));
+  background: color-mix(in srgb, var(--papel) 90%, transparent);
   backdrop-filter: blur(12px);
-  border-top: 1px solid var(--borde);
+  border-top: 1px solid var(--linea);
 }
 
 .btn {
   flex: 1;
-  border-radius: 14px;
-  padding: 12px 14px;
-  font-weight: 700;
+  min-height: 46px;
+  border-radius: 12px;
+  padding: 11px 14px;
+  font-weight: 600;
   font-size: 1rem;
-  background: var(--tarjeta);
-  border: 1px solid var(--borde);
+  border: 1px solid var(--linea-fuerte);
   transition: transform var(--transicion);
 }
 
-.btn:active { transform: scale(.98); }
-/* Deshacer cede el ancho para que «Se acabó el mazo» no parta en dos líneas */
+.btn:active { transform: scale(.985); }
+.btn[disabled] { opacity: .4; cursor: default; }
 .btn.estrecho { flex: 0 1 auto; }
-.btn[disabled] { opacity: .45; cursor: default; }
-.btn.principal { background: var(--texto); color: var(--fondo); border-color: var(--texto); }
+.btn.principal { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
 .btn.simi { background: var(--simi); color: #fff; border-color: var(--simi); }
 .btn.ines { background: var(--ines); color: #fff; border-color: var(--ines); }
 
 @media (prefers-color-scheme: dark) {
-  .btn.simi, .btn.ines { color: #1a1210; }
+  .btn.simi, .btn.ines { color: #16100e; }
 }
 
-/* --- Diálogos -------------------------------------------------- */
+/* --- Diálogos --------------------------------------------------- */
 
 dialog {
-  width: min(520px, 100%);
+  width: min(540px, 100%);
   max-height: 88dvh;
   margin: auto auto 0;
-  padding: 18px 18px calc(18px + env(safe-area-inset-bottom));
+  padding: 20px 18px calc(18px + env(safe-area-inset-bottom));
   border: 0;
   border-radius: 22px 22px 0 0;
-  background: var(--fondo);
-  color: var(--texto);
-  box-shadow: 0 -8px 40px rgba(0, 0, 0, .28);
+  background: var(--papel);
+  color: var(--tinta);
   overflow-y: auto;
 }
 
@@ -377,121 +432,126 @@ dialog {
   dialog { margin: auto; border-radius: 22px; max-height: 86dvh; }
 }
 
-dialog::backdrop { background: rgba(40, 20, 12, .55); }
+dialog::backdrop { background: rgba(30, 16, 10, .55); }
 
-dialog h2 {
-  font-size: 1.22rem;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
+dialog h2 { font-size: 1.42rem; margin-bottom: 2px; }
 
 dialog .sub {
-  margin: 0 0 14px;
-  color: var(--tenue);
+  margin: 0 0 16px;
+  color: var(--tinta-suave);
   font-size: .92rem;
 }
 
-fieldset { border: 0; margin: 0 0 14px; padding: 0; }
+fieldset { border: 0; margin: 0 0 16px; padding: 0; }
 
 legend {
   padding: 0;
-  font-size: .78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .07em;
-  color: var(--tenue);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: .95rem;
+  color: var(--tinta-suave);
   margin-bottom: 8px;
 }
 
 .opciones { display: flex; flex-wrap: wrap; gap: 8px; }
-
-/* Los cinco camellos caben de sobra en una fila: sin esto el quinto baja solo */
 .opciones.cinco { display: grid; grid-template-columns: repeat(5, 1fr); }
 .opciones.cinco .opcion { min-width: 0; padding-inline: 4px; }
 
 .opcion {
   flex: 1 1 auto;
   min-width: 62px;
+  min-height: 46px;
   border-radius: 12px;
-  border: 1px solid var(--borde);
-  background: var(--tarjeta);
-  padding: 8px 10px;
-  font-weight: 700;
+  border: 1px solid var(--linea-fuerte);
+  padding: 7px 10px;
+  font-weight: 600;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 1px;
   transition: transform var(--transicion);
 }
 
 .opcion .pista {
   font-size: .72rem;
-  font-weight: 600;
-  color: var(--tenue);
+  font-weight: 500;
+  color: var(--tinta-suave);
   font-variant-numeric: tabular-nums;
 }
 
 .opcion[aria-pressed="true"] {
-  background: var(--texto);
-  color: var(--fondo);
-  border-color: var(--texto);
+  background: var(--tinta);
+  color: var(--papel);
+  border-color: var(--tinta);
 }
 
-.opcion[aria-pressed="true"] .pista { color: var(--fondo); opacity: .75; }
-.opcion[disabled] { opacity: .38; cursor: default; }
+.opcion[aria-pressed="true"] .pista { color: var(--papel); opacity: .7; }
+.opcion[disabled] { opacity: .35; cursor: default; }
 .opcion:active:not([disabled]) { transform: scale(.96); }
 
 .acciones { display: flex; gap: 8px; margin-top: 4px; }
+dialog > .btn { width: 100%; }
+
+.enlace-sutil {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 8px;
+  font-size: .9rem;
+  color: var(--tinta-suave);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 
 .cuenta {
-  margin: 0 0 14px;
+  margin: 0 0 16px;
   text-align: center;
-  font-size: 3.2rem;
-  font-weight: 800;
+  font-family: var(--serif);
+  font-size: 3.4rem;
+  font-weight: 600;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 
 .cuenta small {
   display: block;
-  font-size: .8rem;
-  font-weight: 600;
-  color: var(--tenue);
-  margin-top: 4px;
+  font-family: var(--sans);
+  font-size: .78rem;
+  font-weight: 500;
+  color: var(--tinta-suave);
+  margin-top: 6px;
 }
 
-/* Aviso de la ficha de bonus robada: informa y se va solo, no pide nada */
+/* --- Aviso de la ficha de bonus --------------------------------- */
+
 .aviso-bonus {
   position: fixed;
   left: 50%;
-  bottom: calc(84px + env(safe-area-inset-bottom));
+  bottom: calc(86px + env(safe-area-inset-bottom));
   z-index: 20;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   max-width: calc(100% - 32px);
-  padding: 12px 18px;
+  padding: 12px 20px;
   border-radius: 999px;
-  background: var(--texto);
-  color: var(--fondo);
-  font-size: .92rem;
+  background: var(--tinta);
+  color: var(--papel);
+  font-size: .9rem;
   text-align: start;
-  box-shadow: 0 6px 24px rgba(40, 20, 12, .35);
-  /* El centrado vive aquí y no solo en el keyframe: al desactivar el movimiento,
-     la animación no llega a aplicarse y el aviso saldría descolocado. */
+  /* El centrado vive aquí y no solo en el keyframe: al desactivar el
+     movimiento la animación no llega a aplicarse y saldría descolocado. */
   transform: translateX(-50%);
   animation: asomar 220ms ease both;
 }
 
 .aviso-bonus .cifra-bonus {
-  font-size: 1.9rem;
-  font-weight: 800;
+  font-family: var(--serif);
+  font-size: 2rem;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   color: var(--oro);
-}
-
-@media (prefers-color-scheme: dark) {
-  .aviso-bonus .cifra-bonus { color: #f5cf7d; }
 }
 
 @keyframes asomar {
@@ -499,145 +559,151 @@ legend {
   to { opacity: 1; transform: translate(-50%, 0); }
 }
 
-.bonus-restante {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 10px 0 0;
-  padding: 0;
-  list-style: none;
-  font-size: .82rem;
-  color: var(--tenue);
-}
+/* --- Tablas ------------------------------------------------------ */
 
-.bonus-restante li {
-  background: var(--tarjeta);
-  border: 1px solid var(--borde);
-  border-radius: 999px;
-  padding: 4px 12px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-.bonus-restante li.vacia { opacity: .5; text-decoration: line-through; }
-
-/* Un .btn suelto dentro de un diálogo no tiene contenedor flex que lo estire */
-dialog > .btn { width: 100%; }
-
-.enlace-sutil {
-  display: block;
-  width: 100%;
-  margin-top: 10px;
-  padding: 8px;
-  font-size: .9rem;
-  font-weight: 600;
-  color: var(--tenue);
-  text-decoration: underline;
-}
-
-/* --- Recuento de la ronda -------------------------------------- */
-
-.recuento {
+.recuento, .tabla {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   font-variant-numeric: tabular-nums;
 }
 
-.recuento caption {
+.recuento caption, .tabla caption {
   text-align: start;
-  font-size: .78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .07em;
-  color: var(--tenue);
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--tinta-suave);
   padding-bottom: 8px;
 }
 
-.recuento th, .recuento td {
-  padding: 7px 6px;
-  border-bottom: 1px solid var(--borde);
+.recuento th, .recuento td, .tabla th, .tabla td {
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--linea);
   text-align: end;
   font-size: .95rem;
 }
 
-.recuento th[scope="row"] { text-align: start; font-weight: 600; color: var(--tenue); }
-.recuento thead th { font-size: .85rem; }
-.recuento thead th:nth-child(2) { color: var(--simi); }
-.recuento thead th:nth-child(3) { color: var(--ines); }
-.recuento .total td, .recuento .total th { font-weight: 800; font-size: 1.15rem; border-bottom: 0; }
+.recuento th[scope="row"], .tabla th[scope="row"] {
+  text-align: start;
+  font-family: var(--sans);
+  font-weight: 500;
+  color: var(--tinta-suave);
+}
+
+.recuento thead th, .tabla thead th { font-family: var(--sans); font-size: .82rem; font-weight: 600; }
+.recuento thead th:nth-child(2), .tabla thead th:nth-child(2) { color: var(--simi); }
+.recuento thead th:nth-child(3), .tabla thead th:nth-child(3) { color: var(--ines); }
+
+.recuento .total td, .recuento .total th {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.3rem;
+  border-bottom: 0;
+}
+
+.recuento .total th { color: var(--tinta); }
 
 .veredicto {
-  background: var(--tarjeta);
-  border: 1px solid var(--borde);
-  border-radius: var(--radio);
-  padding: 14px;
-  margin-bottom: 14px;
+  border-block: 1px solid var(--linea);
+  padding: 16px 4px;
+  margin-bottom: 16px;
   text-align: center;
 }
 
-.veredicto .quien { font-size: 1.3rem; font-weight: 800; margin: 0; }
-.veredicto .porque { margin: 4px 0 0; font-size: .88rem; color: var(--tenue); }
+.veredicto .quien { font-family: var(--serif); font-size: 1.45rem; margin: 0; }
+.veredicto .porque { margin: 6px 0 0; font-size: .88rem; color: var(--tinta-suave); }
 
-/* --- Estadísticas ---------------------------------------------- */
+/* --- Duelo y datos ----------------------------------------------- */
 
 .duelo {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 10px;
-  background: var(--tarjeta);
-  border: 1px solid var(--borde);
-  border-radius: var(--radio);
-  padding: 14px;
-  margin-bottom: 14px;
+  gap: 12px;
+  border-block: 1px solid var(--linea);
+  padding: 18px 4px;
+  margin-bottom: 16px;
   text-align: center;
 }
 
-.duelo .cifra { font-size: 2.6rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.duelo .cifra {
+  font-family: var(--serif);
+  font-size: 3.1rem;
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
 .duelo .cifra.simi { color: var(--simi); }
 .duelo .cifra.ines { color: var(--ines); }
-.duelo .quien { display: block; font-size: .82rem; font-weight: 700; color: var(--tenue); margin-top: 4px; }
-.duelo .vs { font-size: .8rem; font-weight: 700; color: var(--tenue); }
+.duelo .quien { display: block; font-size: .8rem; color: var(--tinta-suave); margin-top: 6px; }
+.duelo .vs { font-family: var(--serif); font-style: italic; font-size: .85rem; color: var(--tinta-suave); }
 
-.datos { list-style: none; margin: 0 0 14px; padding: 0; }
+.datos { list-style: none; margin: 0 0 16px; padding: 0; }
 
 .datos li {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  gap: 12px;
-  padding: 9px 2px;
-  border-bottom: 1px solid var(--borde);
+  gap: 14px;
+  padding: 10px 2px;
+  border-bottom: 1px solid var(--linea);
   font-size: .95rem;
 }
 
-.datos .etiqueta { color: var(--tenue); }
-.datos .valor { font-weight: 700; text-align: end; font-variant-numeric: tabular-nums; }
+.datos .etiqueta { color: var(--tinta-suave); }
+.datos .valor { font-weight: 600; text-align: end; font-variant-numeric: tabular-nums; }
 
 .vacio {
   text-align: center;
-  color: var(--tenue);
-  padding: 22px 10px;
-  font-size: .95rem;
+  color: var(--tinta-suave);
+  font-style: italic;
+  padding: 26px 10px;
 }
 
-/* --- Celebración ------------------------------------------------ */
+/* --- Historial ---------------------------------------------------- */
 
-.confeti {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 10;
+.partidas { list-style: none; margin: 0 0 16px; padding: 0; }
+
+.partidas li {
+  padding: 12px 2px;
+  border-bottom: 1px solid var(--linea);
 }
+
+.partidas .cabeza {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.partidas .fecha { font-size: .82rem; color: var(--tinta-suave); }
+
+.partidas .resultado {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.partidas .resultado.simi { color: var(--simi); }
+.partidas .resultado.ines { color: var(--ines); }
+
+.partidas .rondas {
+  margin: 6px 0 0;
+  font-size: .85rem;
+  color: var(--tinta-suave);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Celebración --------------------------------------------------- */
+
+.confeti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 10; }
 
 .confeti i {
   position: absolute;
   top: -12px;
-  width: 9px;
-  height: 14px;
-  border-radius: 2px;
+  width: 8px;
+  height: 13px;
   animation: caer linear forwards;
 }
 
@@ -645,50 +711,49 @@ dialog > .btn { width: 100%; }
   to { transform: translateY(102dvh) rotate(720deg); opacity: .9; }
 }
 
-/* Sin movimiento: la celebración no se dibuja siquiera (ver celebrar() en el JS),
-   pero se blinda también aquí por si algún estilo se cuela. */
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
   .confeti { display: none; }
   .monton:active, .opcion:active, .btn:active { transform: none; }
 }
 
-.tabla-reglas { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: .9rem; }
-.tabla-reglas th, .tabla-reglas td { padding: 6px; border-bottom: 1px solid var(--borde); text-align: start; }
-.tabla-reglas td:last-child { text-align: end; font-variant-numeric: tabular-nums; color: var(--tenue); }
-.reglas-texto { font-size: .93rem; }
-.reglas-texto li { margin-bottom: 6px; }
+.reglas-texto { font-size: .93rem; padding-inline-start: 20px; }
+.reglas-texto li { margin-bottom: 7px; }
 </style>
 </head>
 <body>
 
+<svg class="visualmente-oculta" aria-hidden="true">
+  <symbol id="g-corazon" viewBox="0 0 24 22">
+    <path d="M12 21C5 16.2 1 12.4 1 8.1 1 4.7 3.6 2 6.9 2 9 2 10.9 3.1 12 4.8 13.1 3.1 15 2 17.1 2 20.4 2 23 4.7 23 8.1c0 4.3-4 8.1-11 12.9z"/>
+  </symbol>
+</svg>
+
 <header class="cabecera">
-  <h1>Jaipur 💕</h1>
+  <h1>Jaipur <svg class="corazon" aria-hidden="true"><use href="#g-corazon"/></svg></h1>
   <p class="ronda" id="etiqueta-ronda">Ronda 1</p>
-  <button type="button" class="btn-icono" id="btn-menu" aria-label="Menú">⋯</button>
+  <button type="button" class="btn-icono" id="btn-menu" aria-label="Menú">···</button>
 </header>
 
 <section class="marcador" aria-label="Marcador">
   <article class="jugadora" data-j="0">
-    <h2 id="nombre-0">Simi</h2>
+    <h2>Simi</h2>
     <p class="rupias"><span id="rupias-0">0</span><small>rupias</small></p>
     <div class="pie-jugadora">
-      <p class="sellos" id="sellos-0" aria-label="Sellos de Simi: 0 de 2"></p>
-      <button type="button" class="btn-camellos" data-camellos="0">
-        <span aria-hidden="true">🐫</span>
-        <span id="camellos-0">0</span>
+      <p class="sellos" id="sellos-0"></p>
+      <button type="button" class="btn-rebano" data-camellos="0">
+        rebaño <b id="camellos-0">0</b>
         <span class="visualmente-oculta">camellos de Simi, pulsa para cambiar</span>
       </button>
     </div>
   </article>
   <article class="jugadora" data-j="1">
-    <h2 id="nombre-1">Inés</h2>
+    <h2>Inés</h2>
     <p class="rupias"><span id="rupias-1">0</span><small>rupias</small></p>
     <div class="pie-jugadora">
-      <p class="sellos" id="sellos-1" aria-label="Sellos de Inés: 0 de 2"></p>
-      <button type="button" class="btn-camellos" data-camellos="1">
-        <span aria-hidden="true">🐫</span>
-        <span id="camellos-1">0</span>
+      <p class="sellos" id="sellos-1"></p>
+      <button type="button" class="btn-rebano" data-camellos="1">
+        rebaño <b id="camellos-1">0</b>
         <span class="visualmente-oculta">camellos de Inés, pulsa para cambiar</span>
       </button>
     </div>
@@ -698,13 +763,13 @@ dialog > .btn { width: 100%; }
 <main>
   <div class="aviso" id="aviso-fin" hidden>
     <p id="aviso-texto"></p>
-    <button type="button" class="btn principal" id="btn-contar">Contar la ronda</button>
+    <button type="button" class="btn principal estrecho" id="btn-contar">Contar la ronda</button>
   </div>
 
-  <h2 class="titulo-seccion">Montones de mercancía</h2>
+  <h2 class="titulo-seccion">Mercancías</h2>
   <ul class="montones" id="montones"></ul>
 
-  <h2 class="titulo-seccion">Fichas de bonus que quedan</h2>
+  <h2 class="titulo-seccion">Bonus por repartir</h2>
   <ul class="bonus-restante" id="bonus-restante"></ul>
 </main>
 
@@ -720,6 +785,8 @@ dialog > .btn { width: 100%; }
 <dialog id="dlg-ronda" aria-labelledby="ronda-titulo"></dialog>
 <dialog id="dlg-menu" aria-labelledby="menu-titulo"></dialog>
 <dialog id="dlg-stats" aria-labelledby="stats-titulo"></dialog>
+<dialog id="dlg-historial" aria-labelledby="historial-titulo"></dialog>
+<dialog id="dlg-copia" aria-labelledby="copia-titulo"></dialog>
 <dialog id="dlg-reglas" aria-labelledby="reglas-titulo"></dialog>
 
 <script>
@@ -731,12 +798,12 @@ dialog > .btn { width: 100%; }
 
 // 38 fichas de mercancía en total, que es lo que dice el reglamento.
 const MERCANCIAS = [
-  { id: 'diamantes', nombre: 'Diamantes', emoji: '💎', fichas: [7, 7, 5, 5, 5],          cartas: 6,  preciosa: true },
-  { id: 'oro',       nombre: 'Oro',       emoji: '🥇', fichas: [6, 6, 5, 5, 5],          cartas: 6,  preciosa: true },
-  { id: 'plata',     nombre: 'Plata',     emoji: '🥈', fichas: [5, 5, 5, 5, 5],          cartas: 6,  preciosa: true },
-  { id: 'tela',      nombre: 'Tela',      emoji: '🧵', fichas: [5, 3, 3, 2, 2, 1, 1],    cartas: 8,  preciosa: false },
-  { id: 'especias',  nombre: 'Especias',  emoji: '🌶️', fichas: [5, 3, 3, 2, 2, 1, 1],    cartas: 8,  preciosa: false },
-  { id: 'cuero',     nombre: 'Cuero',     emoji: '👜', fichas: [4, 3, 2, 1, 1, 1, 1, 1, 1], cartas: 10, preciosa: false }
+  { id: 'diamantes', nombre: 'Diamantes', tono: '#5aa9d6', fichas: [7, 7, 5, 5, 5],             cartas: 6,  preciosa: true },
+  { id: 'oro',       nombre: 'Oro',       tono: '#d6a41f', fichas: [6, 6, 5, 5, 5],             cartas: 6,  preciosa: true },
+  { id: 'plata',     nombre: 'Plata',     tono: '#9aa7ad', fichas: [5, 5, 5, 5, 5],             cartas: 6,  preciosa: true },
+  { id: 'tela',      nombre: 'Tela',      tono: '#8d6bb8', fichas: [5, 3, 3, 2, 2, 1, 1],       cartas: 8,  preciosa: false },
+  { id: 'especias',  nombre: 'Especias',  tono: '#c8552f', fichas: [5, 3, 3, 2, 2, 1, 1],       cartas: 8,  preciosa: false },
+  { id: 'cuero',     nombre: 'Cuero',     tono: '#8a6141', fichas: [4, 3, 2, 1, 1, 1, 1, 1, 1], cartas: 10, preciosa: false }
 ];
 
 // Las de bonus salen boca abajo: la app hace de montón y roba ella, así que las
@@ -750,7 +817,7 @@ const BONUS = {
 const CAMELLO = 5;              // la ficha de camellos vale 5 rupias
 const CAMELLOS_INICIALES = 3;   // con lo que arranca cada jugadora al repartir
 const SELLOS_PARA_GANAR = 2;
-const MANO_MAXIMA = 7;     // no se pueden tener más de 7 cartas, así que no se venden más de 7 de golpe
+const MANO_MAXIMA = 7;          // con 7 cartas de tope, no se venden más de 7 de golpe
 const MONTONES_PARA_ACABAR = 3;
 const JUGADORAS = ['Simi', 'Inés'];
 const CLAVE = 'jaipur-simi-ines-v1';
@@ -777,8 +844,8 @@ function rondaNueva() {
     montones,
     bonusPilas: pilasDeBonus(),
     tomado: [
-      { mercancias: [], bonus: [], camellos: CAMELLOS_INICIALES },
-      { mercancias: [], bonus: [], camellos: CAMELLOS_INICIALES }
+      { ventas: [], camellos: CAMELLOS_INICIALES },
+      { ventas: [], camellos: CAMELLOS_INICIALES }
     ]
   };
 }
@@ -806,15 +873,26 @@ function cargar() {
     // Un guardado a medias (pestaña cerrada en mitad de una escritura) no debe
     // dejar la app en blanco ni reventar al pintar: se descarta y se empieza limpio.
     if (!datos || !datos.partida || !Array.isArray(datos.historial)) return null;
-    // Una partida guardada antes de que la app robase las fichas de bonus no trae
-    // montones que robar. Se le montan sobre la marcha para no tirar el historial.
-    if (!datos.partida.bonusPilas) {
-      datos.partida.bonusPilas = pilasDeBonus();
-      delete datos.partida.bonusRestantes;
-    }
+    migrar(datos);
     return datos;
   } catch (e) {
     return null;
+  }
+}
+
+/** Pone al día una partida guardada por una versión anterior, sin tirar el historial. */
+function migrar(datos) {
+  const p = datos.partida;
+  if (!p.bonusPilas) p.bonusPilas = pilasDeBonus();
+  delete p.bonusRestantes;
+  for (const t of p.tomado) {
+    if (t.ventas) continue;
+    // Antes solo se guardaban los totales sueltos, sin saber de qué mercancía
+    // venía cada ficha: se conservan las rupias y se pierde el desglose.
+    t.ventas = [{ m: null, cartas: 0, fichas: t.mercancias || [], bonus: 0 }];
+    for (const b of t.bonus || []) t.ventas.push({ m: null, cartas: 0, fichas: [], bonus: b });
+    delete t.mercancias;
+    delete t.bonus;
   }
 }
 
@@ -845,6 +923,8 @@ function deshacer() {
    Reglas
    ================================================================= */
 
+const suma = lista => lista.reduce((a, b) => a + b, 0);
+
 function mercancia(id) { return MERCANCIAS.find(m => m.id === id); }
 
 /** Cuántas cartas se pueden vender de golpe: limita la mano y el mazo. */
@@ -862,12 +942,13 @@ function nivelBonus(cantidad) {
   return 0;
 }
 
+const fichasDe = t => t.ventas.flatMap(v => v.fichas);
+const bonusDe = t => t.ventas.map(v => v.bonus).filter(Boolean);
+
 function rupias(j) {
   const t = estado.partida.tomado[j];
-  return suma(t.mercancias) + suma(t.bonus);
+  return suma(fichasDe(t)) + suma(bonusDe(t));
 }
-
-function suma(lista) { return lista.reduce((a, b) => a + b, 0); }
 
 function montonesAgotados() {
   return MERCANCIAS.filter(m => estado.partida.montones[m.id].length === 0).length;
@@ -888,24 +969,23 @@ function lideraCamellos() {
    Acciones
    ================================================================= */
 
-function registrarVenta(j, idMercancia, cantidad) {
+function registrarVenta(j, idMercancia, cartas) {
   guardarParaDeshacer();
   const p = estado.partida;
-  const llevadas = p.montones[idMercancia].splice(0, cantidad);
-  p.tomado[j].mercancias.push(...llevadas);
+  const fichas = p.montones[idMercancia].splice(0, cartas);
 
   // La app hace de montón de bonus: roba la de arriba, que ya venía barajada.
-  const nivel = nivelBonus(cantidad);
+  const nivel = nivelBonus(cartas);
   const ficha = nivel ? (p.bonusPilas[nivel].pop() || 0) : 0;
-  if (ficha) p.tomado[j].bonus.push(ficha);
+  p.tomado[j].ventas.push({ m: idMercancia, cartas, fichas, bonus: ficha });
 
   persistir();
   pintar();
 
   const m = mercancia(idMercancia);
-  const total = suma(llevadas) + ficha;
-  anunciar(`${JUGADORAS[j]} vende ${cantidad} de ${m.nombre.toLowerCase()}: ${total} rupias` +
-    (ficha ? `, con ficha de bonus de ${ficha}` : '') + `. Va por ${rupias(j)}.`);
+  anunciar(`${JUGADORAS[j]} vende ${cartas} de ${m.nombre.toLowerCase()}: ` +
+    `${suma(fichas) + ficha} rupias${ficha ? `, con ficha de bonus de ${ficha}` : ''}. ` +
+    `Va por ${rupias(j)}.`);
 
   if (nivel) mostrarBonus(j, ficha);
 }
@@ -916,11 +996,9 @@ function mostrarBonus(j, ficha) {
   const aviso = document.createElement('button');
   aviso.type = 'button';
   aviso.className = 'aviso-bonus';
-  aviso.dataset.j = String(j);
   aviso.innerHTML = ficha
-    ? `<span class="cifra-bonus">+${ficha}</span>
-       <span>Ficha de bonus<br><strong>${JUGADORAS[j]}</strong></span>`
-    : `<span>Ese montón de bonus<br>ya está vacío</span>`;
+    ? `<span class="cifra-bonus">+${ficha}</span><span>Ficha de bonus<br>para ${JUGADORAS[j]}</span>`
+    : `<span>Ese montón de bonus ya está vacío</span>`;
   aviso.addEventListener('click', () => aviso.remove());
   document.body.appendChild(aviso);
   setTimeout(() => aviso.remove(), 2600);
@@ -942,14 +1020,16 @@ function cambiarCamellos(j, delta) {
 /** Desglose de una jugadora suponiendo que `ganadorCamellos` se lleva la ficha. */
 function desglose(j, ganadorCamellos) {
   const t = estado.partida.tomado[j];
+  const fichas = fichasDe(t);
+  const bonus = bonusDe(t);
   const camello = ganadorCamellos === j ? CAMELLO : 0;
   return {
-    mercancias: suma(t.mercancias),
-    numMercancias: t.mercancias.length,
-    bonus: suma(t.bonus),
-    numBonus: t.bonus.length,
+    mercancias: suma(fichas),
+    numMercancias: fichas.length,
+    bonus: suma(bonus),
+    numBonus: bonus.length,
     camello,
-    total: suma(t.mercancias) + suma(t.bonus) + camello
+    total: suma(fichas) + suma(bonus) + camello
   };
 }
 
@@ -977,11 +1057,17 @@ function cerrarRonda(ganadorCamellos, ganadoraForzada) {
 
   guardarParaDeshacer();
   const p = estado.partida;
-  p.rondas.push({ puntos: [a.total, b.total], detalle: [a, b], ganadora });
+  p.rondas.push({
+    puntos: [a.total, b.total],
+    detalle: [a, b],
+    // El desglose de ventas se guarda para las estadísticas por mercancía
+    ventas: p.tomado.map(t => clonar(t.ventas)),
+    camellos: p.tomado.map(t => t.camellos),
+    ganadora
+  });
   if (ganadora != null) p.sellos[ganadora] += 1;
 
-  const finDePartida = p.sellos.some(s => s >= SELLOS_PARA_GANAR);
-  if (finDePartida) {
+  if (p.sellos.some(s => s >= SELLOS_PARA_GANAR)) {
     const campeona = p.sellos[0] > p.sellos[1] ? 0 : 1;
     estado.historial.unshift({
       fecha: new Date().toISOString(),
@@ -1027,24 +1113,24 @@ function pintar() {
     sellos.setAttribute('aria-label', `Sellos de ${JUGADORAS[j]}: ${p.sellos[j]} de ${SELLOS_PARA_GANAR}`);
 
     // Quien va ganando en camellos se lleva 5 rupias al cerrar la ronda: se avisa antes.
-    const marca = $(`.btn-camellos[data-camellos="${j}"] .lidera`);
-    if (marca) marca.remove();
+    const boton = $(`.btn-rebano[data-camellos="${j}"]`);
+    boton.querySelector('.lidera')?.remove();
     if (lider === j) {
       const etiqueta = document.createElement('span');
       etiqueta.className = 'lidera';
       etiqueta.textContent = '+5';
-      $(`.btn-camellos[data-camellos="${j}"]`).appendChild(etiqueta);
+      boton.appendChild(etiqueta);
     }
   }
 
   pintarMontones();
   pintarBonusRestante();
 
-  const agotados = montonesAgotados();
   const aviso = $('#aviso-fin');
   aviso.hidden = !rondaTerminada();
   if (!aviso.hidden) {
-    $('#aviso-texto').textContent = `Se han agotado ${agotados} mercancías: la ronda termina aquí.`;
+    $('#aviso-texto').textContent =
+      `Se han agotado ${montonesAgotados()} mercancías: la ronda termina aquí.`;
   }
 
   $('#btn-deshacer').disabled = pilaDeshacer.length === 0;
@@ -1064,29 +1150,34 @@ function pintarMontones() {
       `Vender ${m.nombre.toLowerCase()}. Quedan ${restantes.length} fichas` +
       (restantes.length ? `, la siguiente vale ${restantes[0]} rupias.` : '.'));
 
-    const cabeza = document.createElement('span');
-    cabeza.className = 'monton-cabeza';
-    cabeza.innerHTML = `<span aria-hidden="true">${m.emoji}</span><span>${m.nombre}</span>` +
-      `<span class="restantes">${restantes.length}/${m.fichas.length}</span>`;
-    btn.appendChild(cabeza);
+    const marca = document.createElement('span');
+    marca.className = 'marca';
+    marca.style.setProperty('--tono', m.tono);
+    btn.appendChild(marca);
 
-    const fichas = document.createElement('span');
-    fichas.className = 'fichas';
+    const nombre = document.createElement('span');
+    nombre.className = 'monton-nombre';
+    nombre.textContent = m.nombre;
+    btn.appendChild(nombre);
+
     if (restantes.length) {
+      const fichas = document.createElement('span');
+      fichas.className = 'fichas';
       restantes.forEach((v, i) => {
         const f = document.createElement('span');
         f.className = 'ficha' + (i === 0 ? ' siguiente' : '');
         f.textContent = v;
         fichas.appendChild(f);
       });
+      btn.appendChild(fichas);
     } else {
       const vacio = document.createElement('span');
       vacio.className = 'agotado-txt';
-      vacio.textContent = 'Agotada';
-      fichas.appendChild(vacio);
+      vacio.textContent = 'agotada';
+      btn.appendChild(vacio);
     }
-    btn.appendChild(fichas);
 
+    // El contador cabe en el aria-label; en pantalla lo dicen las propias monedas.
     li.appendChild(btn);
     lista.appendChild(li);
   }
@@ -1101,7 +1192,7 @@ function pintarBonusRestante() {
     const quedan = estado.partida.bonusPilas[n].length;
     const li = document.createElement('li');
     if (!quedan) li.className = 'vacia';
-    li.textContent = `${n === 5 ? '5 o más' : n} cartas · ${quedan}`;
+    li.innerHTML = `${n === 5 ? '5 o más' : n} cartas <b>${quedan}</b>`;
     lista.appendChild(li);
   }
 }
@@ -1114,7 +1205,8 @@ function anunciar(texto) { $('#anuncio').textContent = texto; }
 
 function abrir(dlg, html) {
   dlg.innerHTML = html;
-  dlg.showModal();
+  if (!dlg.open) dlg.showModal();
+  dlg.scrollTop = 0;   // si no, reabre con el desplazamiento de la vez anterior
 }
 
 function cerrarTodo() {
@@ -1132,16 +1224,15 @@ function abrirVenta(idMercancia) {
 
   const opciones = [];
   for (let n = 1; n <= maximoVendible(m); n++) {
-    const bloqueada = n < minimo;
     opciones.push(
-      `<button type="button" class="opcion" data-cantidad="${n}" ${bloqueada ? 'disabled' : ''}
+      `<button type="button" class="opcion" data-cantidad="${n}" ${n < minimo ? 'disabled' : ''}
          aria-pressed="${n === minimo}">
          <span>${n}</span><span class="pista" data-pista="${n}"></span>
        </button>`);
   }
 
   abrir($('#dlg-venta'), `
-    <h2 id="venta-titulo"><span aria-hidden="true">${m.emoji}</span> Vender ${m.nombre.toLowerCase()}</h2>
+    <h2 id="venta-titulo">Vender ${m.nombre.toLowerCase()}</h2>
     <p class="sub" id="venta-sub"></p>
     <fieldset>
       <legend>¿Cuántas cartas?</legend>
@@ -1166,10 +1257,7 @@ function actualizarVenta() {
 
   for (let n = 1; n <= maximoVendible(m); n++) {
     const pista = document.querySelector(`#dlg-venta [data-pista="${n}"]`);
-    if (!pista) continue;
-    const valor = suma(fichasQueSeLleva(id, n));
-    const nivel = nivelBonus(n);
-    pista.textContent = nivel ? `${valor}+b` : `${valor}`;
+    if (pista) pista.textContent = suma(fichasQueSeLleva(id, n)) + (nivelBonus(n) ? '+b' : '');
   }
 
   const llevadas = fichasQueSeLleva(id, cantidad);
@@ -1177,12 +1265,8 @@ function actualizarVenta() {
   let texto = llevadas.length
     ? `Se lleva ${llevadas.join(' + ')} = ${suma(llevadas)} rupias`
     : 'El montón está agotado: no se lleva ninguna ficha de mercancía';
-  if (nivel) {
-    texto += `, más una ficha de bonus de ${BONUS[nivel].valores.join('/')}`;
-  }
-  if (llevadas.length < cantidad && llevadas.length) {
-    texto += ` (solo quedaban ${llevadas.length} fichas)`;
-  }
+  if (nivel) texto += `, más una ficha de bonus de ${BONUS[nivel].valores.join('/')}`;
+  if (llevadas.length && llevadas.length < cantidad) texto += ` (solo quedaban ${llevadas.length} fichas)`;
   $('#venta-sub').textContent = texto + '.';
 }
 
@@ -1201,10 +1285,10 @@ function abrirCamellos(j) {
     .join('');
 
   abrir($('#dlg-camellos'), `
-    <h2 id="camellos-titulo"><span aria-hidden="true">🐫</span> Camellos de ${JUGADORAS[j]}</h2>
-    <p class="sub">Quien acabe la ronda con más se lleva la ficha de camellos, que vale
+    <h2 id="camellos-titulo">Rebaño de ${JUGADORAS[j]}</h2>
+    <p class="sub">Quien acabe la ronda con más camellos se lleva la ficha, que vale
       ${CAMELLO} rupias.</p>
-    <p class="cuenta"><span id="cuenta-camellos">0</span><small>en el rebaño</small></p>
+    <p class="cuenta"><span id="cuenta-camellos">0</span><small>camellos</small></p>
     <fieldset>
       <legend>Coger del mercado</legend>
       <div class="opciones cinco">${chips(1, '+')}</div>
@@ -1237,7 +1321,7 @@ let camellosElegidos = null;
 function abrirRecuento() {
   camellosElegidos = lideraCamellos();
   pintarRecuento();
-  $('#dlg-ronda').showModal();
+  if (!$('#dlg-ronda').open) $('#dlg-ronda').showModal();
 }
 
 function pintarRecuento() {
@@ -1256,14 +1340,12 @@ function pintarRecuento() {
   if (veredicto) {
     bloqueVeredicto = `
       <div class="veredicto">
-        <p class="quien">Gana la ronda ${JUGADORAS[veredicto.j]} 🎉</p>
+        <p class="quien">Gana la ronda ${JUGADORAS[veredicto.j]}</p>
         <p class="porque">${veredicto.porque} · se lleva un sello de excelencia</p>
       </div>
-      <div class="acciones">
-        <button type="button" class="btn principal" data-cerrar-ronda="${veredicto.j}">
-          ${p.sellos[veredicto.j] + 1 >= SELLOS_PARA_GANAR ? 'Ganar la partida' : 'Siguiente ronda'}
-        </button>
-      </div>`;
+      <button type="button" class="btn principal" data-cerrar-ronda="${veredicto.j}">
+        ${p.sellos[veredicto.j] + 1 >= SELLOS_PARA_GANAR ? 'Ganar la partida' : 'Siguiente ronda'}
+      </button>`;
   } else {
     // El reglamento no llega hasta aquí: empate en rupias, en bonus y en fichas.
     bloqueVeredicto = `
@@ -1279,7 +1361,7 @@ function pintarRecuento() {
       <button type="button" class="enlace-sutil" data-cerrar-ronda="ninguna">Ronda sin sello</button>`;
   }
 
-  abrirContenido($('#dlg-ronda'), `
+  $('#dlg-ronda').innerHTML = `
     <h2 id="ronda-titulo">Recuento de la ronda ${p.ronda}</h2>
     <p class="sub">Comprueba que cuadra con lo que tienes en la mesa antes de cerrarla.</p>
 
@@ -1306,23 +1388,20 @@ function pintarRecuento() {
 
     ${bloqueVeredicto}
     <button type="button" class="enlace-sutil" data-cerrar>Volver a la partida</button>
-  `);
+  `;
 }
-
-/** Sustituye el contenido de un diálogo que ya puede estar abierto, sin cerrarlo. */
-function abrirContenido(dlg, html) { dlg.innerHTML = html; }
 
 /* --- Fin de partida ---------------------------------------------- */
 
 function mostrarFinDePartida(campeona) {
-  const stats = estadisticas();
+  const s = estadisticas();
   abrir($('#dlg-ronda'), `
-    <h2 id="ronda-titulo">¡Gana ${JUGADORAS[campeona]}! 🏆</h2>
+    <h2 id="ronda-titulo">Gana ${JUGADORAS[campeona]}</h2>
     <p class="sub">Dos sellos de excelencia. Queda guardado en el cara a cara.</p>
     <div class="duelo">
-      <div><span class="cifra simi">${stats.partidas[0]}</span><span class="quien">${JUGADORAS[0]}</span></div>
+      <div><span class="cifra simi">${s.partidas[0]}</span><span class="quien">${JUGADORAS[0]}</span></div>
       <span class="vs">partidas</span>
-      <div><span class="cifra ines">${stats.partidas[1]}</span><span class="quien">${JUGADORAS[1]}</span></div>
+      <div><span class="cifra ines">${s.partidas[1]}</span><span class="quien">${JUGADORAS[1]}</span></div>
     </div>
     <div class="acciones">
       <button type="button" class="btn principal" data-cerrar>Otra partida</button>
@@ -1340,7 +1419,7 @@ function celebrar() {
   // Un <dialog> modal vive en la top layer: el confeti tiene que colgar de él o
   // el fondo oscuro del propio diálogo lo tapa entero.
   const anfitrion = document.querySelector('dialog[open]') || document.body;
-  const colores = ['#e23e6b', '#f79d2e', '#00897b', '#f2c14e', '#c2185b'];
+  const colores = ['#b02a5b', '#d6a41f', '#0f6b5c', '#c8552f', '#8d6bb8'];
   for (let i = 0; i < 40; i++) {
     const trozo = document.createElement('i');
     trozo.style.left = Math.random() * 100 + '%';
@@ -1354,7 +1433,7 @@ function celebrar() {
 }
 
 /* =================================================================
-   Estadísticas del cara a cara
+   Estadísticas
    ================================================================= */
 
 function estadisticas() {
@@ -1416,6 +1495,31 @@ function estadisticas() {
   return s;
 }
 
+/** Qué vende cada una: rupias, ventas y ventas gordas por mercancía. */
+function estadisticasMercancia() {
+  const por = [{}, {}];
+  for (const m of MERCANCIAS) { por[0][m.id] = vacio(); por[1][m.id] = vacio(); }
+
+  for (const partida of estado.historial) {
+    for (const r of partida.rondas) {
+      if (!r.ventas) continue;   // partidas guardadas antes de registrar el desglose
+      r.ventas.forEach((lista, j) => {
+        for (const v of lista) {
+          if (!v.m || !por[j][v.m]) continue;
+          const e = por[j][v.m];
+          e.ventas += 1;
+          e.cartas += v.cartas;
+          e.rupias += suma(v.fichas) + (v.bonus || 0);
+          if (v.cartas >= 5) e.gordas += 1;
+        }
+      });
+    }
+  }
+  return por;
+
+  function vacio() { return { ventas: 0, cartas: 0, rupias: 0, gordas: 0 }; }
+}
+
 function fechaCorta(iso) {
   return new Date(iso).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 }
@@ -1426,7 +1530,8 @@ function abrirEstadisticas() {
   if (!s.total) {
     abrir($('#dlg-stats'), `
       <h2 id="stats-titulo">El cara a cara</h2>
-      <p class="vacio">Todavía no habéis terminado ninguna partida.<br>En cuanto alguna llegue a dos sellos, esto se llena.</p>
+      <p class="vacio">Todavía no habéis terminado ninguna partida.<br>
+        En cuanto alguna llegue a dos sellos, esto se llena.</p>
       <button type="button" class="btn principal" data-cerrar>Volver</button>
     `);
     return;
@@ -1441,9 +1546,34 @@ function abrirEstadisticas() {
     ['Mejor racha', `${s.mejorRacha[0]} — ${s.mejorRacha[1]}`],
     ['Récord de rupias en una ronda', `${s.record.puntos}, ${JUGADORAS[s.record.j]} · ${fechaCorta(s.record.fecha)}`],
     ['Mayor paliza', `${s.paliza.dif} de diferencia, ${JUGADORAS[s.paliza.j]} · ${fechaCorta(s.paliza.fecha)}`],
-    ['Partidas jugadas', String(s.total)],
-    ['Última partida', fechaCorta(estado.historial[0].fecha)]
+    ['Partidas jugadas', String(s.total)]
   ];
+
+  const por = estadisticasMercancia();
+  const hayDesglose = MERCANCIAS.some(m => por[0][m.id].ventas || por[1][m.id].ventas);
+
+  const tablaMercancias = hayDesglose ? `
+    <table class="tabla">
+      <caption>Rupias ganadas con cada mercancía</caption>
+      <thead>
+        <tr><th scope="col">Mercancía</th><th scope="col">${JUGADORAS[0]}</th><th scope="col">${JUGADORAS[1]}</th></tr>
+      </thead>
+      <tbody>
+        ${MERCANCIAS.map(m => `
+          <tr><th scope="row">${m.nombre}</th>
+              <td>${por[0][m.id].rupias}</td><td>${por[1][m.id].rupias}</td></tr>`).join('')}
+      </tbody>
+    </table>
+    <ul class="datos">
+      ${[0, 1].map(j => {
+        const suya = MERCANCIAS.map(m => ({ m, ...por[j][m.id] })).sort((a, b) => b.rupias - a.rupias)[0];
+        const gordas = MERCANCIAS.reduce((n, m) => n + por[j][m.id].gordas, 0);
+        return `<li><span class="etiqueta">Mercancía de ${JUGADORAS[j]}</span>
+                  <span class="valor">${suya.rupias ? `${suya.m.nombre} · ${suya.rupias}` : '—'}</span></li>
+                <li><span class="etiqueta">Ventas de 5 o más de ${JUGADORAS[j]}</span>
+                  <span class="valor">${gordas}</span></li>`;
+      }).join('')}
+    </ul>` : '';
 
   abrir($('#dlg-stats'), `
     <h2 id="stats-titulo">El cara a cara</h2>
@@ -1456,9 +1586,111 @@ function abrirEstadisticas() {
     <ul class="datos">
       ${filas.map(([k, v]) => `<li><span class="etiqueta">${k}</span><span class="valor">${v}</span></li>`).join('')}
     </ul>
+    ${tablaMercancias}
     <button type="button" class="btn principal" data-cerrar>Volver</button>
-    <button type="button" class="enlace-sutil" data-borrar-historial>Borrar el historial</button>
+    <button type="button" class="enlace-sutil" data-abrir-historial>Ver el historial de partidas</button>
   `);
+}
+
+/* =================================================================
+   Historial
+   ================================================================= */
+
+function abrirHistorial() {
+  const h = estado.historial;
+
+  if (!h.length) {
+    abrir($('#dlg-historial'), `
+      <h2 id="historial-titulo">Historial</h2>
+      <p class="vacio">Aquí aparecerán las partidas terminadas.</p>
+      <button type="button" class="btn principal" data-cerrar>Volver</button>
+    `);
+    return;
+  }
+
+  const partidas = h.map(p => {
+    const rondas = p.rondas
+      .map((r, i) => `R${i + 1} ${r.puntos[0]}–${r.puntos[1]}`)
+      .join(' · ');
+    return `
+      <li>
+        <div class="cabeza">
+          <span class="resultado ${p.ganadora === 0 ? 'simi' : 'ines'}">
+            Ganó ${JUGADORAS[p.ganadora]} · ${p.sellos[0]}—${p.sellos[1]}
+          </span>
+          <span class="fecha">${fechaCorta(p.fecha)}</span>
+        </div>
+        <p class="rondas">${rondas}</p>
+      </li>`;
+  }).join('');
+
+  abrir($('#dlg-historial'), `
+    <h2 id="historial-titulo">Historial</h2>
+    <p class="sub">${h.length} ${h.length === 1 ? 'partida terminada' : 'partidas terminadas'}, de la más reciente a la más vieja.</p>
+    <ul class="partidas">${partidas}</ul>
+    <button type="button" class="btn principal" data-cerrar>Volver</button>
+  `);
+}
+
+/* =================================================================
+   Copia de seguridad
+   ================================================================= */
+
+function abrirCopia() {
+  abrir($('#dlg-copia'), `
+    <h2 id="copia-titulo">Copia de seguridad</h2>
+    <p class="sub">El historial vive solo en este navegador. Si borras sus datos o cambias de
+      móvil, se pierde: esta es la única forma de que sobreviva.</p>
+    <div class="acciones" style="flex-direction:column">
+      <button type="button" class="btn" data-exportar>Descargar el historial</button>
+      <button type="button" class="btn" data-importar>Cargar un archivo</button>
+    </div>
+    <p class="sub" id="copia-estado" style="margin-top:14px"></p>
+    <input type="file" id="fichero-copia" accept="application/json,.json" class="visualmente-oculta">
+    <button type="button" class="btn principal" data-cerrar>Volver</button>
+  `);
+}
+
+function exportar() {
+  const datos = JSON.stringify({ version: 1, historial: estado.historial }, null, 2);
+  const url = URL.createObjectURL(new Blob([datos], { type: 'application/json' }));
+  const enlace = document.createElement('a');
+  enlace.href = url;
+  enlace.download = `jaipur-historial-${new Date().toISOString().slice(0, 10)}.json`;
+  enlace.click();
+  URL.revokeObjectURL(url);
+  $('#copia-estado').textContent =
+    `Descargadas ${estado.historial.length} partidas. Guárdalo donde no se borre solo.`;
+}
+
+/**
+ * Importar **suma** en vez de reemplazar: la gracia es juntar lo jugado en dos
+ * teléfonos, y sustituir sin más borraría lo que solo estaba en este.
+ */
+function importar(texto) {
+  let datos;
+  try {
+    datos = JSON.parse(texto);
+  } catch (e) {
+    $('#copia-estado').textContent = 'Ese archivo no se puede leer: no es un JSON válido.';
+    return;
+  }
+  if (!datos || !Array.isArray(datos.historial)) {
+    $('#copia-estado').textContent = 'Ese archivo no tiene el historial de esta app.';
+    return;
+  }
+
+  guardarParaDeshacer();
+  const vistas = new Set(estado.historial.map(p => p.fecha));
+  const nuevas = datos.historial.filter(p => p && p.fecha && !vistas.has(p.fecha));
+  estado.historial = estado.historial.concat(nuevas)
+    .sort((a, b) => (a.fecha < b.fecha ? 1 : -1));
+  persistir();
+  pintar();
+
+  $('#copia-estado').textContent = nuevas.length
+    ? `Añadidas ${nuevas.length} partidas. Ahora hay ${estado.historial.length}.`
+    : 'Ese archivo no traía ninguna partida que no tuvieras ya.';
 }
 
 /* =================================================================
@@ -1470,9 +1702,11 @@ function abrirMenu() {
     <h2 id="menu-titulo">Menú</h2>
     <p class="sub">Ronda ${estado.partida.ronda} · sellos ${estado.partida.sellos[0]}—${estado.partida.sellos[1]}</p>
     <div class="acciones" style="flex-direction:column">
-      <button type="button" class="btn" data-abrir-stats>📊 Estadísticas</button>
-      <button type="button" class="btn" data-abrir-reglas>📖 Cómo se puntúa</button>
-      <button type="button" class="btn" data-nueva-partida>🔄 Empezar otra partida</button>
+      <button type="button" class="btn" data-abrir-stats>Estadísticas</button>
+      <button type="button" class="btn" data-abrir-historial>Historial de partidas</button>
+      <button type="button" class="btn" data-abrir-copia>Copia de seguridad</button>
+      <button type="button" class="btn" data-abrir-reglas>Cómo se puntúa</button>
+      <button type="button" class="btn" data-nueva-partida>Empezar otra partida</button>
     </div>
     <button type="button" class="enlace-sutil" data-cerrar>Cerrar</button>
   `);
@@ -1480,14 +1714,14 @@ function abrirMenu() {
 
 function abrirReglas() {
   const filas = MERCANCIAS
-    .map(m => `<tr><th scope="row">${m.emoji} ${m.nombre}</th><td>${m.fichas.join(' · ')}</td></tr>`)
+    .map(m => `<tr><th scope="row">${m.nombre}</th><td>${m.fichas.join(' · ')}</td></tr>`)
     .join('');
 
   abrir($('#dlg-reglas'), `
     <h2 id="reglas-titulo">Cómo se puntúa</h2>
     <p class="sub">La chuleta, por si hay discusión en mitad de la partida.</p>
-    <table class="tabla-reglas">
-      <caption class="visualmente-oculta">Valor de las fichas de cada mercancía, de la primera a la última</caption>
+    <table class="tabla">
+      <caption>Fichas de cada mercancía, de la primera a la última</caption>
       <tbody>${filas}</tbody>
     </table>
     <ul class="reglas-texto">
@@ -1508,8 +1742,7 @@ function abrirReglas() {
 
 function nuevaPartida() {
   const p = estado.partida;
-  const empezada = p.ronda > 1 || p.rondas.length > 0 ||
-    p.tomado.some(t => t.mercancias.length || t.bonus.length || t.camellos);
+  const empezada = p.ronda > 1 || p.rondas.length > 0 || p.tomado.some(t => t.ventas.length);
   if (empezada && !confirm('Hay una partida a medias. ¿Seguro que quieres empezar otra?')) return;
 
   guardarParaDeshacer();
@@ -1528,17 +1761,12 @@ document.addEventListener('click', ev => {
   const t = ev.target.closest('button');
   if (!t) return;
 
-  // --- Cerrar cualquier diálogo
-  if (t.hasAttribute('data-cerrar')) {
-    t.closest('dialog').close();
-    return;
-  }
+  if (t.hasAttribute('data-cerrar')) { t.closest('dialog').close(); return; }
 
-  // --- Montones
   const monton = t.closest('.monton');
   if (monton) { abrirVenta(monton.dataset.mercancia); return; }
 
-  // --- Venta: cantidad
+  // --- Venta
   if (t.dataset.cantidad) {
     ventaEnCurso.cantidad = Number(t.dataset.cantidad);
     document.querySelectorAll('#dlg-venta [data-cantidad]')
@@ -1546,8 +1774,6 @@ document.addEventListener('click', ev => {
     actualizarVenta();
     return;
   }
-
-  // --- Venta: quién vende
   if (t.dataset.vende) { confirmarVenta(Number(t.dataset.vende)); return; }
 
   // --- Camellos
@@ -1562,10 +1788,9 @@ document.addEventListener('click', ev => {
   if (t.dataset.camellosGanadora) {
     camellosElegidos = Number(t.dataset.camellosGanadora);
     pintarRecuento();
-    // Repintar el diálogo entero destruye el botón que se acaba de pulsar y con él
-    // el foco; sin esto, quien navegue con teclado o lector vuelve al principio.
-    const mismo = $(`#dlg-ronda [data-camellos-ganadora="${camellosElegidos}"]`);
-    if (mismo) mismo.focus();
+    // Repintar el diálogo destruye el botón que se acaba de pulsar y con él el foco;
+    // sin esto, quien navegue con teclado o lector vuelve al principio.
+    $(`#dlg-ronda [data-camellos-ganadora="${camellosElegidos}"]`)?.focus();
     return;
   }
   if (t.dataset.cerrarRonda) {
@@ -1577,16 +1802,25 @@ document.addEventListener('click', ev => {
 
   // --- Menú
   if (t.hasAttribute('data-abrir-stats')) { cerrarTodo(); abrirEstadisticas(); return; }
+  if (t.hasAttribute('data-abrir-historial')) { cerrarTodo(); abrirHistorial(); return; }
+  if (t.hasAttribute('data-abrir-copia')) { cerrarTodo(); abrirCopia(); return; }
   if (t.hasAttribute('data-abrir-reglas')) { cerrarTodo(); abrirReglas(); return; }
   if (t.hasAttribute('data-nueva-partida')) { nuevaPartida(); return; }
-  if (t.hasAttribute('data-borrar-historial')) {
-    if (!confirm('Se borra el cara a cara entero y no se puede recuperar. ¿Seguro?')) return;
-    estado.historial = [];
-    persistir();
-    cerrarTodo();
-    anunciar('Historial borrado.');
-    return;
-  }
+
+  // --- Copia de seguridad
+  if (t.hasAttribute('data-exportar')) { exportar(); return; }
+  if (t.hasAttribute('data-importar')) { $('#fichero-copia').click(); return; }
+});
+
+document.addEventListener('change', ev => {
+  if (ev.target.id !== 'fichero-copia') return;
+  const fichero = ev.target.files[0];
+  if (!fichero) return;
+  const lector = new FileReader();
+  lector.onload = () => importar(String(lector.result));
+  lector.onerror = () => { $('#copia-estado').textContent = 'No se pudo leer el archivo.'; };
+  lector.readAsText(fichero);
+  ev.target.value = '';   // permite volver a elegir el mismo archivo
 });
 
 $('#btn-menu').addEventListener('click', abrirMenu);
@@ -1597,9 +1831,7 @@ $('#btn-fin-ronda').addEventListener('click', () => {
 });
 
 // Los <dialog> se cierran con Escape sin avisar: hay que soltar el estado a medias.
-document.querySelectorAll('dialog').forEach(d => {
-  d.addEventListener('close', () => { if (d.id === 'dlg-venta') ventaEnCurso = null; });
-});
+$('#dlg-venta').addEventListener('close', () => { ventaEnCurso = null; });
 
 /* =================================================================
    Arranque
