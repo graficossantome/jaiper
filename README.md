@@ -10,9 +10,10 @@ Sin dependencias, sin servidor y sin cuentas. Un HTML, un service worker y tres 
 ## Cómo se usa
 
 - **Toca el montón** de la mercancía que se vende → elige cuántas cartas → quién vende. Si son 3 o
-  más, pide el valor de la ficha de bonus que salga.
-- **El botón del camello** de cada jugadora lleva su rebaño. Quien acabe con más se lleva las 5
-  rupias, y la app lo avisa con un `+5` antes de cerrar la ronda.
+  más, la app roba la ficha de bonus por su cuenta y la enseña un momento.
+- **El botón del camello** de cada jugadora lleva su rebaño: se cogen y se gastan de una a cinco de
+  golpe, y el diálogo se queda abierto para encadenar cambios. Cada ronda reparte 3 a cada una.
+  Quien acabe con más se lleva las 5 rupias, y la app lo avisa con un `+5` antes de cerrar la ronda.
 - **La ronda termina sola** al agotarse tres montones. Si se acaba antes el mazo, está el botón de
   abajo.
 - **Deshacer** revierte la última acción, tantas veces como haga falta dentro de la partida.
@@ -56,7 +57,21 @@ Suman las 38 fichas de mercancía del reglamento, y los montones de bonus (7 de 
 5 de cinco) suman las 18 que declara. Si algún valor no coincide con la caja, se corrige en la
 constante `MERCANCIAS` de `index.html`.
 
-El resto: bonus de 1/2/3 al vender 3 cartas, 4/5/6 al vender 4 y 8/9/10 al vender 5 o más. Ficha de
-camellos de 5 rupias para quien acabe con más. Mínimo de dos cartas para vender diamantes, oro o
-plata. La ronda acaba al agotarse tres montones o el mazo. Los empates se resuelven por fichas de
-bonus y después por fichas de mercancía. La partida es de quien logre dos sellos de excelencia.
+El resto: mínimo de dos cartas para vender diamantes, oro o plata. La ronda acaba al agotarse tres
+montones o el mazo. Los empates se resuelven por fichas de bonus y después por fichas de mercancía.
+La partida es de quien logre dos sellos de excelencia.
+
+Las **fichas de bonus las reparte la app**: monta los tres montones al empezar cada ronda, los
+baraja y roba la de arriba en cada venta de 3 o más, así que las de cartón se quedan en la caja.
+
+| Montón | Fichas |
+| --- | --- |
+| Vender 3 | 1 · 1 · 2 · 2 · 2 · 3 · 3 |
+| Vender 4 | 4 · 4 · 5 · 5 · 6 · 6 |
+| Vender 5 o más | 8 · 8 · 9 · 10 · 10 |
+
+Son 18, las del reglamento, pero ninguna fuente publica cuántas hay de cada valor: es el reparto
+estándar asumido. Si la caja dice otra cosa, se corrige en la constante `BONUS`.
+
+Cada ronda arranca además con **3 camellos por jugadora** (`CAMELLOS_INICIALES`), que es cosa de
+la casa y no del reglamento.

@@ -405,6 +405,10 @@ legend {
 
 .opciones { display: flex; flex-wrap: wrap; gap: 8px; }
 
+/* Los cinco camellos caben de sobra en una fila: sin esto el quinto baja solo */
+.opciones.cinco { display: grid; grid-template-columns: repeat(5, 1fr); }
+.opciones.cinco .opcion { min-width: 0; padding-inline: 4px; }
+
 .opcion {
   flex: 1 1 auto;
   min-width: 62px;
@@ -438,6 +442,84 @@ legend {
 .opcion:active:not([disabled]) { transform: scale(.96); }
 
 .acciones { display: flex; gap: 8px; margin-top: 4px; }
+
+.cuenta {
+  margin: 0 0 14px;
+  text-align: center;
+  font-size: 3.2rem;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.cuenta small {
+  display: block;
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--tenue);
+  margin-top: 4px;
+}
+
+/* Aviso de la ficha de bonus robada: informa y se va solo, no pide nada */
+.aviso-bonus {
+  position: fixed;
+  left: 50%;
+  bottom: calc(84px + env(safe-area-inset-bottom));
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100% - 32px);
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: var(--texto);
+  color: var(--fondo);
+  font-size: .92rem;
+  text-align: start;
+  box-shadow: 0 6px 24px rgba(40, 20, 12, .35);
+  /* El centrado vive aquí y no solo en el keyframe: al desactivar el movimiento,
+     la animación no llega a aplicarse y el aviso saldría descolocado. */
+  transform: translateX(-50%);
+  animation: asomar 220ms ease both;
+}
+
+.aviso-bonus .cifra-bonus {
+  font-size: 1.9rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--oro);
+}
+
+@media (prefers-color-scheme: dark) {
+  .aviso-bonus .cifra-bonus { color: #f5cf7d; }
+}
+
+@keyframes asomar {
+  from { opacity: 0; transform: translate(-50%, 10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.bonus-restante {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: .82rem;
+  color: var(--tenue);
+}
+
+.bonus-restante li {
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.bonus-restante li.vacia { opacity: .5; text-decoration: line-through; }
 
 /* Un .btn suelto dentro de un diálogo no tiene contenedor flex que lo estire */
 dialog > .btn { width: 100%; }
@@ -621,6 +703,9 @@ dialog > .btn { width: 100%; }
 
   <h2 class="titulo-seccion">Montones de mercancía</h2>
   <ul class="montones" id="montones"></ul>
+
+  <h2 class="titulo-seccion">Fichas de bonus que quedan</h2>
+  <ul class="bonus-restante" id="bonus-restante"></ul>
 </main>
 
 <footer class="barra">
@@ -631,7 +716,6 @@ dialog > .btn { width: 100%; }
 <div id="anuncio" class="visualmente-oculta" role="status" aria-live="polite"></div>
 
 <dialog id="dlg-venta" aria-labelledby="venta-titulo"></dialog>
-<dialog id="dlg-bonus" aria-labelledby="bonus-titulo"></dialog>
 <dialog id="dlg-camellos" aria-labelledby="camellos-titulo"></dialog>
 <dialog id="dlg-ronda" aria-labelledby="ronda-titulo"></dialog>
 <dialog id="dlg-menu" aria-labelledby="menu-titulo"></dialog>
@@ -655,14 +739,16 @@ const MERCANCIAS = [
   { id: 'cuero',     nombre: 'Cuero',     emoji: '👜', fichas: [4, 3, 2, 1, 1, 1, 1, 1, 1], cartas: 10, preciosa: false }
 ];
 
-// Las de bonus salen boca abajo: solo se sabe el rango hasta que se le da la vuelta.
+// Las de bonus salen boca abajo: la app hace de montón y roba ella, así que las
+// fichas de cartón se quedan en la caja. Son 18, como manda el reglamento.
 const BONUS = {
-  3: { valores: [1, 2, 3],  total: 7 },
-  4: { valores: [4, 5, 6],  total: 6 },
-  5: { valores: [8, 9, 10], total: 5 }
+  3: { valores: [1, 2, 3],  fichas: [1, 1, 2, 2, 2, 3, 3] },
+  4: { valores: [4, 5, 6],  fichas: [4, 4, 5, 5, 6, 6] },
+  5: { valores: [8, 9, 10], fichas: [8, 8, 9, 10, 10] }
 };
 
-const CAMELLO = 5;         // la ficha de camellos vale 5 rupias
+const CAMELLO = 5;              // la ficha de camellos vale 5 rupias
+const CAMELLOS_INICIALES = 3;   // con lo que arranca cada jugadora al repartir
 const SELLOS_PARA_GANAR = 2;
 const MANO_MAXIMA = 7;     // no se pueden tener más de 7 cartas, así que no se venden más de 7 de golpe
 const MONTONES_PARA_ACABAR = 3;
@@ -687,16 +773,29 @@ function partidaNueva() {
 function rondaNueva() {
   const montones = {};
   for (const m of MERCANCIAS) montones[m.id] = m.fichas.slice();
-  const bonusRestantes = {};
-  for (const n of [3, 4, 5]) bonusRestantes[n] = BONUS[n].total;
   return {
     montones,
-    bonusRestantes,
+    bonusPilas: pilasDeBonus(),
     tomado: [
-      { mercancias: [], bonus: [], camellos: 0 },
-      { mercancias: [], bonus: [], camellos: 0 }
+      { mercancias: [], bonus: [], camellos: CAMELLOS_INICIALES },
+      { mercancias: [], bonus: [], camellos: CAMELLOS_INICIALES }
     ]
   };
+}
+
+/** Los tres montones de bonus, barajados como se barajan en la mesa. */
+function pilasDeBonus() {
+  const pilas = {};
+  for (const n of [3, 4, 5]) pilas[n] = barajar(BONUS[n].fichas.slice());
+  return pilas;
+}
+
+function barajar(lista) {
+  for (let i = lista.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [lista[i], lista[j]] = [lista[j], lista[i]];
+  }
+  return lista;
 }
 
 function cargar() {
@@ -707,6 +806,12 @@ function cargar() {
     // Un guardado a medias (pestaña cerrada en mitad de una escritura) no debe
     // dejar la app en blanco ni reventar al pintar: se descarta y se empieza limpio.
     if (!datos || !datos.partida || !Array.isArray(datos.historial)) return null;
+    // Una partida guardada antes de que la app robase las fichas de bonus no trae
+    // montones que robar. Se le montan sobre la marcha para no tirar el historial.
+    if (!datos.partida.bonusPilas) {
+      datos.partida.bonusPilas = pilasDeBonus();
+      delete datos.partida.bonusRestantes;
+    }
     return datos;
   } catch (e) {
     return null;
@@ -783,24 +888,42 @@ function lideraCamellos() {
    Acciones
    ================================================================= */
 
-function registrarVenta(j, idMercancia, cantidad, valorBonus) {
+function registrarVenta(j, idMercancia, cantidad) {
   guardarParaDeshacer();
   const p = estado.partida;
   const llevadas = p.montones[idMercancia].splice(0, cantidad);
   p.tomado[j].mercancias.push(...llevadas);
 
+  // La app hace de montón de bonus: roba la de arriba, que ya venía barajada.
   const nivel = nivelBonus(cantidad);
-  if (nivel && valorBonus) {
-    p.tomado[j].bonus.push(valorBonus);
-    p.bonusRestantes[nivel] = Math.max(0, p.bonusRestantes[nivel] - 1);
-  }
+  const ficha = nivel ? (p.bonusPilas[nivel].pop() || 0) : 0;
+  if (ficha) p.tomado[j].bonus.push(ficha);
 
   persistir();
   pintar();
 
   const m = mercancia(idMercancia);
-  const total = suma(llevadas) + (valorBonus || 0);
-  anunciar(`${JUGADORAS[j]} vende ${cantidad} de ${m.nombre.toLowerCase()}: ${total} rupias. Va por ${rupias(j)}.`);
+  const total = suma(llevadas) + ficha;
+  anunciar(`${JUGADORAS[j]} vende ${cantidad} de ${m.nombre.toLowerCase()}: ${total} rupias` +
+    (ficha ? `, con ficha de bonus de ${ficha}` : '') + `. Va por ${rupias(j)}.`);
+
+  if (nivel) mostrarBonus(j, ficha);
+}
+
+/** Enseña la ficha robada un momento; no pide nada, solo informa. */
+function mostrarBonus(j, ficha) {
+  document.querySelectorAll('.aviso-bonus').forEach(t => t.remove());
+  const aviso = document.createElement('button');
+  aviso.type = 'button';
+  aviso.className = 'aviso-bonus';
+  aviso.dataset.j = String(j);
+  aviso.innerHTML = ficha
+    ? `<span class="cifra-bonus">+${ficha}</span>
+       <span>Ficha de bonus<br><strong>${JUGADORAS[j]}</strong></span>`
+    : `<span>Ese montón de bonus<br>ya está vacío</span>`;
+  aviso.addEventListener('click', () => aviso.remove());
+  document.body.appendChild(aviso);
+  setTimeout(() => aviso.remove(), 2600);
 }
 
 function cambiarCamellos(j, delta) {
@@ -915,6 +1038,7 @@ function pintar() {
   }
 
   pintarMontones();
+  pintarBonusRestante();
 
   const agotados = montonesAgotados();
   const aviso = $('#aviso-fin');
@@ -964,6 +1088,20 @@ function pintarMontones() {
     btn.appendChild(fichas);
 
     li.appendChild(btn);
+    lista.appendChild(li);
+  }
+}
+
+/* Saber cuántas fichas gordas siguen vivas cambia cómo se juega, y con la app
+   haciendo de montón ya no se ve el grosor de la pila en la mesa. */
+function pintarBonusRestante() {
+  const lista = $('#bonus-restante');
+  lista.innerHTML = '';
+  for (const n of [3, 4, 5]) {
+    const quedan = estado.partida.bonusPilas[n].length;
+    const li = document.createElement('li');
+    if (!quedan) li.className = 'vacia';
+    li.textContent = `${n === 5 ? '5 o más' : n} cartas · ${quedan}`;
     lista.appendChild(li);
   }
 }
@@ -1050,63 +1188,46 @@ function actualizarVenta() {
 
 function confirmarVenta(j) {
   const { mercancia: id, cantidad } = ventaEnCurso;
-  const nivel = nivelBonus(cantidad);
   $('#dlg-venta').close();
-
-  if (!nivel) {
-    registrarVenta(j, id, cantidad, 0);
-    return;
-  }
-  abrirBonus(j, id, cantidad, nivel);
-}
-
-/* --- Ficha de bonus --------------------------------------------- */
-
-function abrirBonus(j, idMercancia, cantidad, nivel) {
-  const quedan = estado.partida.bonusRestantes[nivel];
-  const botones = BONUS[nivel].valores
-    .map(v => `<button type="button" class="opcion" data-bonus="${v}"><span>${v}</span></button>`)
-    .join('');
-
-  abrir($('#dlg-bonus'), `
-    <h2 id="bonus-titulo">Ficha de bonus</h2>
-    <p class="sub">${JUGADORAS[j]} vende ${cantidad} cartas, así que coge una ficha del montón de
-      ${nivel === 5 ? '5 o más' : nivel}. Dale la vuelta y marca cuánto vale.
-      ${quedan ? `Quedan ${quedan}.` : 'Ese montón ya estaba vacío.'}</p>
-    <fieldset>
-      <legend>¿Cuánto vale?</legend>
-      <div class="opciones">${botones}</div>
-    </fieldset>
-    <button type="button" class="enlace-sutil" data-bonus="0">No queda ninguna ficha de ese montón</button>
-  `);
-
-  $('#dlg-bonus').dataset.venta = JSON.stringify({ j, idMercancia, cantidad });
+  registrarVenta(j, id, cantidad);
 }
 
 /* --- Camellos ---------------------------------------------------- */
 
 function abrirCamellos(j) {
-  const actual = estado.partida.tomado[j].camellos;
-  const mas = [1, 2, 3, 4, 5]
-    .map(n => `<button type="button" class="opcion" data-camello-delta="${n}"><span>+${n}</span></button>`)
+  const chips = (signo, etiqueta) => [1, 2, 3, 4, 5]
+    .map(n => `<button type="button" class="opcion" data-camello-delta="${signo * n}">
+                 <span>${etiqueta}${n}</span></button>`)
     .join('');
 
   abrir($('#dlg-camellos'), `
     <h2 id="camellos-titulo"><span aria-hidden="true">🐫</span> Camellos de ${JUGADORAS[j]}</h2>
-    <p class="sub">Ahora mismo tiene <strong>${actual}</strong>. Quien acabe la ronda con más se lleva
-      la ficha de camellos, que vale ${CAMELLO} rupias.</p>
+    <p class="sub">Quien acabe la ronda con más se lleva la ficha de camellos, que vale
+      ${CAMELLO} rupias.</p>
+    <p class="cuenta"><span id="cuenta-camellos">0</span><small>en el rebaño</small></p>
     <fieldset>
-      <legend>Coge del mercado</legend>
-      <div class="opciones">${mas}</div>
+      <legend>Coger del mercado</legend>
+      <div class="opciones cinco">${chips(1, '+')}</div>
     </fieldset>
-    <div class="acciones">
-      <button type="button" class="btn" data-camello-delta="-1">−1</button>
-      <button type="button" class="btn" data-camello-cero>Poner a 0</button>
-    </div>
-    <button type="button" class="enlace-sutil" data-cerrar>Listo</button>
+    <fieldset>
+      <legend>Gastar en un intercambio</legend>
+      <div class="opciones cinco">${chips(-1, '−')}</div>
+    </fieldset>
+    <button type="button" class="btn principal" data-cerrar>Listo</button>
   `);
 
   $('#dlg-camellos').dataset.jugadora = String(j);
+  actualizarCamellos();
+}
+
+/** El diálogo se queda abierto entre toques: rara vez se ajusta el rebaño una sola vez. */
+function actualizarCamellos() {
+  const j = Number($('#dlg-camellos').dataset.jugadora);
+  const n = estado.partida.tomado[j].camellos;
+  $('#cuenta-camellos').textContent = n;
+  document.querySelectorAll('#dlg-camellos [data-camello-delta]').forEach(b => {
+    b.disabled = n + Number(b.dataset.camelloDelta) < 0;
+  });
 }
 
 /* --- Recuento de la ronda ---------------------------------------- */
@@ -1370,8 +1491,11 @@ function abrirReglas() {
       <tbody>${filas}</tbody>
     </table>
     <ul class="reglas-texto">
-      <li><strong>Bonus:</strong> vender 3 da 1/2/3 · vender 4 da 4/5/6 · vender 5 o más da 8/9/10.</li>
-      <li><strong>Camellos:</strong> quien acabe con más se lleva ${CAMELLO} rupias.</li>
+      <li><strong>Bonus:</strong> vender 3 da 1/2/3 · vender 4 da 4/5/6 · vender 5 o más da 8/9/10.
+        Las fichas las roba la app de sus tres montones barajados, así que las de cartón se quedan
+        en la caja.</li>
+      <li><strong>Camellos:</strong> cada una empieza la ronda con ${CAMELLOS_INICIALES}, y quien
+        acabe con más se lleva ${CAMELLO} rupias.</li>
       <li><strong>Diamantes, oro y plata</strong> solo se pueden vender de dos en dos como mínimo.</li>
       <li><strong>La ronda acaba</strong> al agotarse 3 montones de mercancía, o al quedarse el mazo
         sin cartas para reponer el mercado.</li>
@@ -1426,26 +1550,11 @@ document.addEventListener('click', ev => {
   // --- Venta: quién vende
   if (t.dataset.vende) { confirmarVenta(Number(t.dataset.vende)); return; }
 
-  // --- Bonus
-  if (t.hasAttribute('data-bonus')) {
-    const dlg = $('#dlg-bonus');
-    const { j, idMercancia, cantidad } = JSON.parse(dlg.dataset.venta);
-    dlg.close();
-    registrarVenta(j, idMercancia, cantidad, Number(t.dataset.bonus));
-    return;
-  }
-
   // --- Camellos
   if (t.dataset.camellos) { abrirCamellos(Number(t.dataset.camellos)); return; }
   if (t.dataset.camelloDelta) {
     cambiarCamellos(Number($('#dlg-camellos').dataset.jugadora), Number(t.dataset.camelloDelta));
-    $('#dlg-camellos').close();
-    return;
-  }
-  if (t.hasAttribute('data-camello-cero')) {
-    const j = Number($('#dlg-camellos').dataset.jugadora);
-    cambiarCamellos(j, -estado.partida.tomado[j].camellos);
-    $('#dlg-camellos').close();
+    actualizarCamellos();
     return;
   }
 
@@ -1496,6 +1605,9 @@ document.querySelectorAll('dialog').forEach(d => {
    Arranque
    ================================================================= */
 
+// Se guarda ya, sin esperar a la primera jugada: así los montones de bonus que se
+// acaban de barajar son los mismos si se recarga la página antes de tocar nada.
+persistir();
 pintar();
 
 // Sin conexión también se juega: el service worker guarda la app entera.
