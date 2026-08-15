@@ -293,36 +293,30 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 
 .montones li + li { border-top: 1px solid var(--linea); }
 
+/* Cada mercancía se identifica por el color de su carta, apagado hasta ser un
+   fondo: el nombre y el emoji sobraban en cuanto la fila entera dice cuál es. */
 .monton {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 12px;
   min-height: 56px;
-  padding: 8px 14px;
+  padding: 8px 12px;
   text-align: start;
+  background: color-mix(in srgb, var(--tono) var(--tinte, 14%), var(--papel-alto));
   transition: background var(--transicion);
 }
 
-.monton:active { background: var(--papel-hundido); }
+.monton:active { --tinte: 28%; }
 
-.simbolo {
-  flex: 0 0 auto;
-  width: 32px;
-  height: 32px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  font-size: 1.2rem;
-  line-height: 1;
-  background: color-mix(in srgb, var(--tono) 18%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tono) 45%, transparent);
+@media (prefers-color-scheme: dark) {
+  .monton { --tinte: 24%; }
+  .monton:active { --tinte: 38%; }
 }
 
 .fichas {
   display: flex;
   flex-wrap: wrap;
-  gap: 2px;
+  gap: 1px;
   justify-content: flex-start;
 }
 
@@ -331,21 +325,23 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
    diagonal ocupase un 41 % más de ancho y las nueve de cuero no cabrían. */
 .ficha {
   position: relative;
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   display: grid;
   place-items: center;
-  color: var(--tinta-suave);
-  font-size: .88rem;
+  color: var(--tinta);
+  font-size: 1rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
+/* Relleno sólido: sobre la fila teñida, un rombo hueco se perdía */
 .ficha::before {
   content: "";
   position: absolute;
-  inset: 5px;
-  border: 1px solid var(--linea-fuerte);
+  inset: 6px;
+  background: var(--papel-alto);
+  border: 1px solid color-mix(in srgb, var(--tono) 55%, transparent);
   border-radius: 3px;
   transform: rotate(45deg);
 }
@@ -354,14 +350,15 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
    y, sin esto, se pintaría por encima de la cifra. */
 .ficha .valor-ficha { position: relative; z-index: 1; }
 
-.ficha.siguiente { color: var(--oro); }
+.ficha.siguiente { font-weight: 700; }
 
 .ficha.siguiente::before {
-  border-color: var(--oro);
-  background: color-mix(in srgb, var(--oro) 15%, transparent);
+  border-width: 2px;
+  border-color: color-mix(in srgb, var(--tono) 90%, transparent);
+  background: color-mix(in srgb, var(--tono) 26%, var(--papel-alto));
 }
 
-.monton.agotado .simbolo { opacity: .4; }
+.monton.agotado { opacity: .55; }
 
 .agotado-txt {
   margin-inline-start: auto;
@@ -816,11 +813,11 @@ dialog > .btn { width: 100%; }
 
 // 38 fichas de mercancía en total, que es lo que dice el reglamento.
 const MERCANCIAS = [
-  { id: 'diamantes', nombre: 'Diamantes', emoji: '💎', tono: '#5aa9d6', fichas: [7, 7, 5, 5, 5],             cartas: 6,  preciosa: true },
-  { id: 'oro',       nombre: 'Oro',       emoji: '🥇', tono: '#d6a41f', fichas: [6, 6, 5, 5, 5],             cartas: 6,  preciosa: true },
-  { id: 'plata',     nombre: 'Plata',     emoji: '🥈', tono: '#9aa7ad', fichas: [5, 5, 5, 5, 5],             cartas: 6,  preciosa: true },
-  { id: 'tela',      nombre: 'Tela',      emoji: '🧵', tono: '#8d6bb8', fichas: [5, 3, 3, 2, 2, 1, 1],       cartas: 8,  preciosa: false },
-  { id: 'especias',  nombre: 'Especias',  emoji: '🌶️', tono: '#c8552f', fichas: [5, 3, 3, 2, 2, 1, 1],       cartas: 8,  preciosa: false },
+  { id: 'diamantes', nombre: 'Diamantes', emoji: '💎', tono: '#c0392b', fichas: [7, 7, 5, 5, 5],             cartas: 6,  preciosa: true },
+  { id: 'oro',       nombre: 'Oro',       emoji: '🥇', tono: '#cf9a12', fichas: [6, 6, 5, 5, 5],             cartas: 6,  preciosa: true },
+  { id: 'plata',     nombre: 'Plata',     emoji: '🥈', tono: '#8b949a', fichas: [5, 5, 5, 5, 5],             cartas: 6,  preciosa: true },
+  { id: 'tela',      nombre: 'Tela',      emoji: '🧵', tono: '#7d5aa8', fichas: [5, 3, 3, 2, 2, 1, 1],       cartas: 8,  preciosa: false },
+  { id: 'especias',  nombre: 'Especias',  emoji: '🌶️', tono: '#4f8f3f', fichas: [5, 3, 3, 2, 2, 1, 1],       cartas: 8,  preciosa: false },
   { id: 'cuero',     nombre: 'Cuero',     emoji: '👜', tono: '#8a6141', fichas: [4, 3, 2, 1, 1, 1, 1, 1, 1], cartas: 10, preciosa: false }
 ];
 
@@ -1169,12 +1166,7 @@ function pintarMontones() {
       `Vender ${m.nombre.toLowerCase()}. Quedan ${restantes.length} fichas` +
       (restantes.length ? `, la siguiente vale ${restantes[0]} rupias.` : '.'));
 
-    const simbolo = document.createElement('span');
-    simbolo.className = 'simbolo';
-    simbolo.style.setProperty('--tono', m.tono);
-    simbolo.textContent = m.emoji;
-    simbolo.setAttribute('aria-hidden', 'true');
-    btn.appendChild(simbolo);
+    btn.style.setProperty('--tono', m.tono);
 
     if (restantes.length) {
       const fichas = document.createElement('span');
