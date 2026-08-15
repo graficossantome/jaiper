@@ -158,9 +158,20 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   overflow: hidden;
 }
 
-.jugadora { padding: 11px 12px 9px; }
+.jugadora { padding: 10px 12px 9px; }
 .jugadora[data-j="0"] { --color-j: var(--simi); }
 .jugadora[data-j="1"] { --color-j: var(--ines); border-left: 1px solid var(--linea); }
+
+/* Nombre y sellos comparten renglón; el filete doble es el acento de color,
+   en vez de la barra superior de plantilla que traía la primera versión. */
+.cabeza-jugadora {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 5px;
+  border-bottom: 3px double color-mix(in srgb, var(--color-j) 55%, transparent);
+}
 
 .jugadora h2 {
   font-size: 1.05rem;
@@ -168,21 +179,10 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   letter-spacing: .01em;
 }
 
-/* Filete doble bajo el nombre: el acento de color sin la barra superior de plantilla */
-.jugadora h2::after {
-  content: "";
-  display: block;
-  margin-top: 6px;
-  height: 3px;
-  border-top: 1px solid var(--color-j);
-  border-bottom: 1px solid var(--color-j);
-  opacity: .45;
-}
-
 .rupias {
-  margin: 6px 0 0;
+  margin: 0;
   font-family: var(--serif);
-  font-size: 2.4rem;
+  font-size: 1.85rem;
   font-weight: 600;
   line-height: 1;
   letter-spacing: -.02em;
@@ -201,8 +201,8 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 .pie-jugadora {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 14px;
+  justify-content: space-between;
+  gap: 8px;
   margin-top: 8px;
 }
 
@@ -308,8 +308,8 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 
 .simbolo {
   flex: 0 0 auto;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
   border-radius: 50%;
@@ -322,28 +322,43 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 .fichas {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 2px;
   justify-content: flex-start;
 }
 
-/* Las fichas son monedas: redondas, con su filete y su número tabular */
+/* Fichas en rombo, como las gemas del juego. El rombo lo dibuja un
+   pseudo-elemento girado dentro de la caja: girar la ficha entera haría que su
+   diagonal ocupase un 41 % más de ancho y las nueve de cuero no cabrían. */
 .ficha {
-  width: 28px;
-  height: 28px;
+  position: relative;
+  width: 30px;
+  height: 30px;
   display: grid;
   place-items: center;
-  border-radius: 50%;
-  border: 1px solid var(--linea-fuerte);
   color: var(--tinta-suave);
-  font-size: .95rem;
+  font-size: .88rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
-.ficha.siguiente {
+.ficha::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid var(--linea-fuerte);
+  border-radius: 3px;
+  transform: rotate(45deg);
+}
+
+/* El número va en su propio span posicionado: el rombo es un elemento absoluto
+   y, sin esto, se pintaría por encima de la cifra. */
+.ficha .valor-ficha { position: relative; z-index: 1; }
+
+.ficha.siguiente { color: var(--oro); }
+
+.ficha.siguiente::before {
   border-color: var(--oro);
-  color: var(--oro);
-  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--oro) 20%, transparent);
+  background: color-mix(in srgb, var(--oro) 15%, transparent);
 }
 
 .monton.agotado .simbolo { opacity: .4; }
@@ -736,10 +751,12 @@ dialog > .btn { width: 100%; }
 
 <section class="marcador" aria-label="Marcador">
   <article class="jugadora" data-j="0">
-    <h2>Simi</h2>
-    <p class="rupias"><span id="rupias-0">0</span><small>rupias</small></p>
-    <div class="pie-jugadora">
+    <div class="cabeza-jugadora">
+      <h2>Simi</h2>
       <p class="sellos" id="sellos-0"></p>
+    </div>
+    <div class="pie-jugadora">
+      <p class="rupias"><span id="rupias-0">0</span><small>rupias</small></p>
       <button type="button" class="btn-rebano" data-camellos="0">
         <span aria-hidden="true">🐫</span> <b id="camellos-0">0</b>
         <span class="visualmente-oculta">camellos de Simi, pulsa para cambiar</span>
@@ -747,10 +764,12 @@ dialog > .btn { width: 100%; }
     </div>
   </article>
   <article class="jugadora" data-j="1">
-    <h2>Inés</h2>
-    <p class="rupias"><span id="rupias-1">0</span><small>rupias</small></p>
-    <div class="pie-jugadora">
+    <div class="cabeza-jugadora">
+      <h2>Inés</h2>
       <p class="sellos" id="sellos-1"></p>
+    </div>
+    <div class="pie-jugadora">
+      <p class="rupias"><span id="rupias-1">0</span><small>rupias</small></p>
       <button type="button" class="btn-rebano" data-camellos="1">
         <span aria-hidden="true">🐫</span> <b id="camellos-1">0</b>
         <span class="visualmente-oculta">camellos de Inés, pulsa para cambiar</span>
@@ -1163,7 +1182,10 @@ function pintarMontones() {
       restantes.forEach((v, i) => {
         const f = document.createElement('span');
         f.className = 'ficha' + (i === 0 ? ' siguiente' : '');
-        f.textContent = v;
+        const valor = document.createElement('span');
+        valor.className = 'valor-ficha';
+        valor.textContent = v;
+        f.appendChild(valor);
         fichas.appendChild(f);
       });
       btn.appendChild(fichas);
