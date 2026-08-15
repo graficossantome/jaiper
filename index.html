@@ -187,17 +187,17 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   font-variant-numeric: tabular-nums lining-nums;
 }
 
-/* Con tres cifras, la mitad del cuadro no da de sí y el marcador desbordaba
-   la pantalla en móviles de 375 px. Se encoge solo cuando hace falta. */
-.rupias.larga { font-size: 2.3rem; }
-
 .pie-jugadora {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 6px 8px;
   margin-top: 6px;
 }
+
+/* Al envolver, el rebaño se queda solo en su línea y se va a la derecha */
+.pie-jugadora .btn-rebano { margin-inline-start: auto; }
 
 .sellos { display: flex; gap: 5px; margin: 0; }
 
@@ -747,6 +747,7 @@ dialog > .btn { width: 100%; }
 <dialog id="dlg-historial" aria-labelledby="historial-titulo"></dialog>
 <dialog id="dlg-copia" aria-labelledby="copia-titulo"></dialog>
 <dialog id="dlg-reglas" aria-labelledby="reglas-titulo"></dialog>
+<dialog id="dlg-confirmar" aria-labelledby="confirmar-titulo"></dialog>
 
 <script>
 'use strict';
@@ -876,7 +877,7 @@ function deshacer() {
   estado = pilaDeshacer.pop();
   persistir();
   pintar();
-  anunciar('Última acción deshecha')
+  anunciar('Última acción deshecha');
 }
 
 /* =================================================================
@@ -1061,9 +1062,7 @@ function pintar() {
 
   const lider = lideraCamellos();
   for (const j of [0, 1]) {
-    const cifra = rupias(j);
-    $(`#rupias-${j}`).textContent = cifra;
-    $(`#rupias-${j}`).parentElement.classList.toggle('larga', String(cifra).length >= 3);
+    $(`#rupias-${j}`).textContent = rupias(j);
     $(`#camellos-${j}`).textContent = p.tomado[j].camellos;
 
     const sellos = $(`#sellos-${j}`);
@@ -1153,6 +1152,24 @@ function cerrarTodo() {
   document.querySelectorAll('dialog[open]').forEach(d => d.close());
 }
 
+/**
+ * Confirmación propia en vez de window.confirm: en el visor de archivos del
+ * móvil, donde Simi abre la app, el diálogo nativo no llega a aparecer y la
+ * respuesta vuelve como un «no» silencioso. Así el botón siempre responde.
+ */
+let alConfirmar = null;
+
+function confirmar(pregunta, etiquetaSi, accion) {
+  alConfirmar = accion;
+  abrir($('#dlg-confirmar'), `
+    <h2 id="confirmar-titulo">${pregunta}</h2>
+    <div class="acciones">
+      <button type="button" class="btn principal" data-confirmar>${etiquetaSi}</button>
+      <button type="button" class="btn" data-cerrar>Cancelar</button>
+    </div>
+  `);
+}
+
 /* --- Venta ------------------------------------------------------ */
 
 let ventaEnCurso = null;
@@ -1173,7 +1190,6 @@ function abrirVenta(idMercancia) {
 
   abrir($('#dlg-venta'), `
     <h2 id="venta-titulo">${m.emoji} Vender ${m.nombre.toLowerCase()}</h2>
-    <p class="sub" id="venta-sub"></p>
     <fieldset>
       <legend>¿Cuántas cartas?</legend>
       <div class="opciones">${opciones.join('')}</div>
@@ -1200,14 +1216,6 @@ function actualizarVenta() {
     if (pista) pista.textContent = suma(fichasQueSeLleva(id, n)) + (nivelBonus(n) ? '+b' : '');
   }
 
-  const llevadas = fichasQueSeLleva(id, cantidad);
-  const nivel = nivelBonus(cantidad);
-  let texto = llevadas.length
-    ? `Se lleva ${llevadas.join(' + ')} = ${suma(llevadas)} rupias`
-    : 'El montón está agotado: no se lleva ninguna ficha de mercancía';
-  if (nivel) texto += `, más una ficha de bonus de ${BONUS[nivel].valores.join('/')}`;
-  if (llevadas.length && llevadas.length < cantidad) texto += ` (solo quedaban ${llevadas.length} fichas)`;
-  $('#venta-sub').textContent = texto + '.';
 }
 
 function confirmarVenta(j) {
@@ -1226,8 +1234,6 @@ function abrirCamellos(j) {
 
   abrir($('#dlg-camellos'), `
     <h2 id="camellos-titulo">${EMOJI_CAMELLO} Rebaño de ${JUGADORAS[j]}</h2>
-    <p class="sub">Quien acabe la ronda con más camellos se lleva la ficha, que vale
-      ${CAMELLO} rupias.</p>
     <p class="cuenta"><span id="cuenta-camellos">0</span><small>camellos</small></p>
     <fieldset>
       <legend>Coger del mercado</legend>
@@ -1588,6 +1594,7 @@ function abrirCopia() {
     <p class="sub" id="copia-estado" style="margin-top:14px"></p>
     <input type="file" id="fichero-copia" accept="application/json,.json" class="visualmente-oculta">
     <button type="button" class="btn principal" data-cerrar>Volver</button>
+    <button type="button" class="enlace-sutil" data-borrar-historial>Borrar el historial</button>
   `);
 }
 
@@ -1683,14 +1690,20 @@ function abrirReglas() {
 function nuevaPartida() {
   const p = estado.partida;
   const empezada = p.ronda > 1 || p.rondas.length > 0 || p.tomado.some(t => t.ventas.length);
-  if (empezada && !confirm('Hay una partida a medias. ¿Seguro que quieres empezar otra?')) return;
+  if (empezada) {
+    confirmar('Hay una partida a medias. ¿Empezar otra?', 'Empezar otra', arrancarPartida);
+    return;
+  }
+  arrancarPartida();
+}
 
+function arrancarPartida() {
   guardarParaDeshacer();
   estado.partida = partidaNueva();
   persistir();
   pintar();
   cerrarTodo();
-  anunciar('Partida nueva')
+  anunciar('Partida nueva');
 }
 
 /* =================================================================
@@ -1750,6 +1763,25 @@ document.addEventListener('click', ev => {
   // --- Copia de seguridad
   if (t.hasAttribute('data-exportar')) { exportar(); return; }
   if (t.hasAttribute('data-importar')) { $('#fichero-copia').click(); return; }
+  if (t.hasAttribute('data-borrar-historial')) {
+    confirmar('Se borra el cara a cara entero y no se puede recuperar.', 'Borrar el historial', () => {
+      guardarParaDeshacer();
+      estado.historial = [];
+      persistir();
+      cerrarTodo();
+      anunciar('Historial borrado');
+    });
+    return;
+  }
+
+  // --- Confirmación propia
+  if (t.hasAttribute('data-confirmar')) {
+    $('#dlg-confirmar').close();
+    const accion = alConfirmar;
+    alConfirmar = null;
+    if (accion) accion();
+    return;
+  }
 });
 
 document.addEventListener('change', ev => {
@@ -1767,7 +1799,8 @@ $('#btn-menu').addEventListener('click', abrirMenu);
 $('#btn-deshacer').addEventListener('click', deshacer);
 $('#btn-contar').addEventListener('click', abrirRecuento);
 $('#btn-fin-ronda').addEventListener('click', () => {
-  if (rondaTerminada() || confirm('¿Se acabó el mazo y con él la ronda?')) abrirRecuento();
+  if (rondaTerminada()) { abrirRecuento(); return; }
+  confirmar('¿Se acabó el mazo y con él la ronda?', 'Contar la ronda', abrirRecuento);
 });
 
 // Los <dialog> se cierran con Escape sin avisar: hay que soltar el estado a medias.
