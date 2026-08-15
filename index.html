@@ -767,8 +767,16 @@ dialog > .btn { width: 100%; }
 .reglas-texto { font-size: .93rem; padding-inline-start: 20px; }
 .reglas-texto li { margin-bottom: 7px; }
 
-/* Espejo: se mira, no se toca. La partida la lleva el otro móvil. */
-body.espejo button { pointer-events: none; opacity: .5; }
+/* Espejo: se mira, no se toca. La partida la lleva el otro móvil.
+   Antes se atenuaba con `opacity: .5` cada botón, y como los montones de
+   mercancía y los marcadores SON botones, el espejo pintaba la partida entera
+   a media tinta: los colores se veían lavados y no había gama que lo salvara,
+   porque la opacidad se aplica encima. Ahora los toques se ignoran sin tocar
+   el color, y quien mira lo sabe por la banda de arriba, que lo dice con
+   palabras. La media tinta se queda solo en los botones del pie, que son los
+   únicos que ahí no llevan a ninguna parte. */
+body.espejo button { pointer-events: none; }
+body.espejo .barra .botones { opacity: .5; }
 body.espejo #btn-menu { display: none; }
 .banda-espejo {
   display: none;
