@@ -1,9 +1,5 @@
 <!doctype html>
-<!--
-  El original de esta app vive en el vault, en «3. personal/jaipur». Esta copia
-  la sirve GitHub Pages y se genera sola: no la edites aquí, o el próximo
-  publicado se lleva por delante el cambio. Para publicar: jaipur-publicar
--->
+<!-- Este es el original, y el mismo repo que sirve GitHub Pages. Para publicar: jaipur-publicar -->
 <html lang="es">
 <head>
 <meta charset="utf-8">
@@ -52,6 +48,16 @@
   --oro: #9c6a12;
   --foco: #0b57d0;
 
+  /* El tono de cada mercancía. Vive aquí, y no solo en la constante MERCANCIAS,
+     para que la pantalla del iPhone pueda pintarlo en su gama ancha: el JS pone
+     `--tono: var(--tono-diamantes)` y el bloque de más abajo hace el resto. */
+  --tono-diamantes: #c0392b;
+  --tono-oro: #cf9a12;
+  --tono-plata: #8b949a;
+  --tono-tela: #7d5aa8;
+  --tono-especias: #4f8f3f;
+  --tono-cuero: #8a6141;
+
   /* Inter viaja dentro de la app, en el repo y en el caché del service worker: no
      se pide a ningún servidor de fuentes, así que sigue abriendo sin conexión.
      Antes se pedía Avenir Next, que está en el iPhone pero no en Android, y las
@@ -74,6 +80,43 @@
     --acento: #ff9db8;
     --oro: #e0ae5b;
     --foco: #9ec2ff;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Gama ancha: los colores en el iPhone
+   ---------------------------------------------------------------
+   La pantalla del iPhone pinta Display P3, bastante más ancha que el
+   sRGB de un hex, y un `#b02a5b` se queda a medio camino de lo que la
+   pantalla puede dar: por eso el fucsia y los tonos de mercancía se
+   veían lavados. Aquí se repiten los mismos colores con sus mismas
+   coordenadas, pero declaradas en P3, que es como llevarlos hasta el
+   borde de la gama sin cambiarles el matiz ni la luminosidad. Los hex
+   de arriba siguen siendo el respaldo para las pantallas normales.
+
+   Solo se amplían los colores que tienen que cantar. El papel y la
+   tinta se quedan en sRGB a propósito: ahí no hay nada que ganar y sí
+   que perder, porque de eso depende que se lea. */
+@supports (color: color(display-p3 1 0 0)) {
+  :root {
+    --acento: color(display-p3 .690 .165 .357);
+    --oro:    color(display-p3 .612 .416 .071);
+    --foco:   color(display-p3 .043 .341 .816);
+
+    --tono-diamantes: color(display-p3 .753 .224 .169);
+    --tono-oro:       color(display-p3 .812 .604 .071);
+    --tono-plata:     color(display-p3 .545 .580 .604);
+    --tono-tela:      color(display-p3 .490 .353 .659);
+    --tono-especias:  color(display-p3 .310 .561 .247);
+    --tono-cuero:     color(display-p3 .541 .380 .255);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --acento: color(display-p3 1 .616 .722);
+      --oro:    color(display-p3 .878 .682 .357);
+      --foco:   color(display-p3 .620 .761 1);
+    }
   }
 }
 
@@ -332,7 +375,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   min-height: 56px;
   padding: 8px 12px;
   text-align: start;
-  background: color-mix(in srgb, var(--tono) var(--tinte, 14%), var(--papel-alto));
+  background: color-mix(in oklab, var(--tono) var(--tinte, 14%), var(--papel-alto));
   transition: background var(--transicion);
 }
 
@@ -358,7 +401,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   place-items: center;
   border-radius: 50%;
   background: var(--papel-alto);
-  border: 1px solid color-mix(in srgb, var(--tono) 55%, transparent);
+  border: 1px solid color-mix(in oklab, var(--tono) 55%, transparent);
   color: var(--tinta);
   font-size: 1rem;
   font-weight: 600;
@@ -367,8 +410,8 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 
 .ficha.siguiente {
   border-width: 2px;
-  border-color: color-mix(in srgb, var(--tono) 90%, transparent);
-  background: color-mix(in srgb, var(--tono) 26%, var(--papel-alto));
+  border-color: color-mix(in oklab, var(--tono) 90%, transparent);
+  background: color-mix(in oklab, var(--tono) 26%, var(--papel-alto));
   font-weight: 700;
 }
 
@@ -823,12 +866,12 @@ body.espejo .banda-espejo { display: block; }
 
 // 38 fichas de mercancía en total, que es lo que dice el reglamento.
 const MERCANCIAS = [
-  { id: 'diamantes', nombre: 'Diamantes', emoji: '💎', tono: '#c0392b', fichas: [7, 7, 5, 5, 5],             cartas: 6,  preciosa: true },
-  { id: 'oro',       nombre: 'Oro',       emoji: '🥇', tono: '#cf9a12', fichas: [6, 6, 5, 5, 5],             cartas: 6,  preciosa: true },
-  { id: 'plata',     nombre: 'Plata',     emoji: '🥈', tono: '#8b949a', fichas: [5, 5, 5, 5, 5],             cartas: 6,  preciosa: true },
-  { id: 'tela',      nombre: 'Tela',      emoji: '🧵', tono: '#7d5aa8', fichas: [5, 3, 3, 2, 2, 1, 1],       cartas: 8,  preciosa: false },
-  { id: 'especias',  nombre: 'Especias',  emoji: '🌶️', tono: '#4f8f3f', fichas: [5, 3, 3, 2, 2, 1, 1],       cartas: 8,  preciosa: false },
-  { id: 'cuero',     nombre: 'Cuero',     emoji: '👜', tono: '#8a6141', fichas: [4, 3, 2, 1, 1, 1, 1, 1, 1], cartas: 10, preciosa: false }
+  { id: 'diamantes', nombre: 'Diamantes', emoji: '💎', fichas: [7, 7, 5, 5, 5],             cartas: 6,  preciosa: true },
+  { id: 'oro',       nombre: 'Oro',       emoji: '🥇', fichas: [6, 6, 5, 5, 5],             cartas: 6,  preciosa: true },
+  { id: 'plata',     nombre: 'Plata',     emoji: '🥈', fichas: [5, 5, 5, 5, 5],             cartas: 6,  preciosa: true },
+  { id: 'tela',      nombre: 'Tela',      emoji: '🧵', fichas: [5, 3, 3, 2, 2, 1, 1],       cartas: 8,  preciosa: false },
+  { id: 'especias',  nombre: 'Especias',  emoji: '🌶️', fichas: [5, 3, 3, 2, 2, 1, 1],       cartas: 8,  preciosa: false },
+  { id: 'cuero',     nombre: 'Cuero',     emoji: '👜', fichas: [4, 3, 2, 1, 1, 1, 1, 1, 1], cartas: 10, preciosa: false }
 ];
 
 // Las de bonus salen boca abajo: la app hace de montón y roba ella, así que las
@@ -847,6 +890,13 @@ const MANO_MAXIMA = 7;          // con 7 cartas de tope, no se venden más de 7 
 const MONTONES_PARA_ACABAR = 3;
 const JUGADORAS = ['Simi', 'Inés'];
 const CLAVE = 'jaipur-simi-ines-v1';
+
+/* El espejo se declara aquí arriba, y no junto al resto de su código, porque
+   `cargar()` lo consulta al arrancar: el móvil que mira guarda lo último que
+   bajó en su propia clave, para no pisar la partida ni el historial del móvil
+   que lleva la cuenta. */
+const ESPEJO = new URLSearchParams(location.search).has('espejo');
+const CLAVE_ESPEJO = CLAVE + '-espejo';
 
 /* =================================================================
    Estado
@@ -893,7 +943,7 @@ function barajar(lista) {
 
 function cargar() {
   try {
-    const crudo = localStorage.getItem(CLAVE);
+    const crudo = localStorage.getItem(ESPEJO ? CLAVE_ESPEJO : CLAVE);
     if (!crudo) return null;
     const datos = JSON.parse(crudo);
     // Un guardado a medias (pestaña cerrada en mitad de una escritura) no debe
@@ -925,7 +975,7 @@ function migrar(datos) {
 function persistir() {
   subirEstado();
   try {
-    localStorage.setItem(CLAVE, JSON.stringify(estado));
+    localStorage.setItem(ESPEJO ? CLAVE_ESPEJO : CLAVE, JSON.stringify(estado));
   } catch (e) {
     avisarGuardadoRoto('Se acaba de intentar guardar y no se ha podido. La partida sigue en ' +
       'pantalla, pero si cierras se pierde.');
@@ -1205,7 +1255,7 @@ function pintarMontones() {
       `Vender ${m.nombre.toLowerCase()}. Quedan ${restantes.length} fichas` +
       (restantes.length ? `, la siguiente vale ${restantes[0]} rupias.` : '.'));
 
-    btn.style.setProperty('--tono', m.tono);
+    btn.style.setProperty('--tono', `var(--tono-${m.id})`);
 
     if (restantes.length) {
       const fichas = document.createElement('span');
@@ -1347,14 +1397,14 @@ function abrirCamellos(j) {
       <legend>Gastar en un intercambio</legend>
       <div class="opciones cinco">${chips(-1, '−')}</div>
     </fieldset>
-    <button type="button" class="btn principal" data-cerrar>Listo</button>
+    <button type="button" class="enlace-sutil" data-cerrar>Cancelar</button>
   `);
 
   $('#dlg-camellos').dataset.jugadora = String(j);
   actualizarCamellos();
 }
 
-/** El diálogo se queda abierto entre toques: rara vez se ajusta el rebaño una sola vez. */
+/** Solo pinta la cuenta: el toque que cambia el rebaño ya cierra el diálogo. */
 function actualizarCamellos() {
   const j = Number($('#dlg-camellos').dataset.jugadora);
   const n = estado.partida.tomado[j].camellos;
@@ -1953,8 +2003,10 @@ document.addEventListener('click', ev => {
   // --- Camellos
   if (t.dataset.camellos) { abrirCamellos(Number(t.dataset.camellos)); return; }
   if (t.dataset.camelloDelta) {
-    cambiarCamellos(Number($('#dlg-camellos').dataset.jugadora), Number(t.dataset.camelloDelta));
-    actualizarCamellos();
+    // Como una venta: el toque que elige la cantidad ya cierra el diálogo.
+    const j = Number($('#dlg-camellos').dataset.jugadora);
+    $('#dlg-camellos').close();
+    cambiarCamellos(j, Number(t.dataset.camelloDelta));
     return;
   }
 
@@ -2046,7 +2098,6 @@ $('#dlg-venta').addEventListener('close', () => { ventaEnCurso = null; });
 const NUBE = 'https://jhacoozqeqyrqlwammkz.supabase.co/rest/v1/partida';
 const NUBE_CLAVE = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoYWNvb3pxZXF5cnFsd2FtbWt6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3OTk4MDUsImV4cCI6MjEwMjM3NTgwNX0.QTyZHP3tj1QZlD8vqisBxtm0WE_H_hk1dh2rbB8_2b4';
 const NUBE_ID = 'simi-ines';
-const ESPEJO = new URLSearchParams(location.search).has('espejo');
 const CADENCIA_ESPEJO = 2000;
 
 const cabecerasNube = {
@@ -2089,6 +2140,10 @@ async function bajarEstado() {
     migrar(fila.estado);
     estado = fila.estado;
     pintar();
+    // Se guarda lo último que se bajó: si el móvil que mira se queda sin cobertura
+    // y la app se recarga o el sistema la descarta, vuelve con el último marcador
+    // conocido en vez de con la partida a cero.
+    persistir();
   } catch (e) {
     banda.classList.add('sin-conexion');
     banda.textContent = 'Espejo sin conexión: el marcador puede estar viejo';

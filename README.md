@@ -12,7 +12,8 @@ Sin dependencias, sin servidor y sin cuentas. Un HTML, un service worker y tres 
 - **Toca el montón** de la mercancía que se vende → elige cuántas cartas → quién vende. Si son 3 o
   más, la app roba la ficha de bonus por su cuenta y la enseña un momento.
 - **El botón del camello** de cada jugadora lleva su rebaño: se cogen y se gastan de una a cinco de
-  golpe, y el diálogo se queda abierto para encadenar cambios. Cada ronda reparte 3 a cada una.
+  golpe, y el toque que elige la cantidad ya cierra el diálogo, igual que una venta. Cada ronda
+  reparte 3 a cada una.
   Quien acabe con más se lleva las 5 rupias, y la app lo avisa con un `+5` antes de cerrar la ronda.
 - **La ronda termina sola** al agotarse tres montones. Si se acaba antes el mazo, está el botón de
   abajo.
