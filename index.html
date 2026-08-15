@@ -704,6 +704,20 @@ dialog > .btn { width: 100%; }
 
 .reglas-texto { font-size: .93rem; padding-inline-start: 20px; }
 .reglas-texto li { margin-bottom: 7px; }
+
+/* Espejo: se mira, no se toca. La partida la lleva el otro móvil. */
+body.espejo button { pointer-events: none; opacity: .5; }
+body.espejo #btn-menu { display: none; }
+.banda-espejo {
+  display: none;
+  padding: 6px 14px;
+  text-align: center;
+  font-size: .85rem;
+  background: #2d3b4e;
+  color: #e8edf3;
+}
+body.espejo .banda-espejo { display: block; }
+.banda-espejo.sin-conexion { background: #7a3b2e; }
 </style>
 </head>
 <body>
@@ -713,6 +727,8 @@ dialog > .btn { width: 100%; }
     <path d="M12 21C5 16.2 1 12.4 1 8.1 1 4.7 3.6 2 6.9 2 9 2 10.9 3.1 12 4.8 13.1 3.1 15 2 17.1 2 20.4 2 23 4.7 23 8.1c0 4.3-4 8.1-11 12.9z"/>
   </symbol>
 </svg>
+
+<p class="banda-espejo" id="banda-espejo">Espejo: la partida la lleva el otro móvil</p>
 
 <header class="cabecera">
   <h1>Jaipur <svg class="corazon" aria-hidden="true"><use href="#g-corazon"/></svg></h1>
@@ -888,6 +904,7 @@ function migrar(datos) {
 }
 
 function persistir() {
+  subirEstado();
   try {
     localStorage.setItem(CLAVE, JSON.stringify(estado));
   } catch (e) {
@@ -1992,6 +2009,78 @@ $('#btn-fin-ronda').addEventListener('click', () => {
 
 // Los <dialog> se cierran con Escape sin avisar: hay que soltar el estado a medias.
 $('#dlg-venta').addEventListener('close', () => { ventaEnCurso = null; });
+
+/* =================================================================
+   El espejo: el segundo móvil mira, no toca
+   =================================================================
+   Una sola fila en Supabase guarda la partida entera. El móvil que lleva la
+   cuenta la sube cada vez que cambia algo; el que abre la app con ?espejo la
+   baja cada dos segundos y la pinta. En un solo sentido a propósito: con una
+   sola fuente de verdad no hay conflictos que resolver.
+
+   Se consulta en bucle en vez de usar el tiempo real de Supabase porque aquel
+   pide cargar su librería desde internet, y eso dejaría la app sin poder abrirse
+   sin conexión. La clave de abajo es la `anon` pública: va en un repo público
+   por diseño, y lo que puede hacer lo limitan las reglas RLS de la tabla.
+   ================================================================= */
+
+const NUBE = 'https://jhacoozqeqyrqlwammkz.supabase.co/rest/v1/partida';
+const NUBE_CLAVE = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpoYWNvb3pxZXF5cnFsd2FtbWt6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3OTk4MDUsImV4cCI6MjEwMjM3NTgwNX0.QTyZHP3tj1QZlD8vqisBxtm0WE_H_hk1dh2rbB8_2b4';
+const NUBE_ID = 'simi-ines';
+const ESPEJO = new URLSearchParams(location.search).has('espejo');
+const CADENCIA_ESPEJO = 2000;
+
+const cabecerasNube = {
+  'apikey': NUBE_CLAVE,
+  'Authorization': `Bearer ${NUBE_CLAVE}`,
+  'Content-Type': 'application/json'
+};
+
+let subidaPendiente = null;
+
+/** Sube la partida entera. Se agrupa: varios cambios seguidos son una sola subida. */
+function subirEstado() {
+  if (ESPEJO) return;
+  clearTimeout(subidaPendiente);
+  const copia = JSON.stringify({ id: NUBE_ID, estado, actualizado: new Date().toISOString() });
+  subidaPendiente = setTimeout(() => {
+    fetch(NUBE, {
+      method: 'POST',
+      headers: { ...cabecerasNube, 'Prefer': 'resolution=merge-duplicates' },
+      body: copia
+    }).catch(() => { /* sin cobertura se sigue jugando; la próxima jugada vuelve a subirlo todo */ });
+  }, 400);
+}
+
+/** En el espejo: baja la partida y la pinta si ha cambiado. */
+let ultimoVisto = null;
+
+async function bajarEstado() {
+  const banda = $('#banda-espejo');
+  try {
+    const r = await fetch(`${NUBE}?id=eq.${NUBE_ID}&select=estado,actualizado`, { headers: cabecerasNube });
+    if (!r.ok) throw new Error(r.status);
+    const [fila] = await r.json();
+    banda.classList.remove('sin-conexion');
+    banda.textContent = 'Espejo: la partida la lleva el otro móvil';
+    if (!fila || fila.actualizado === ultimoVisto) return;
+    ultimoVisto = fila.actualizado;
+    // Una partida recién creada en la nube viene vacía: no hay nada que pintar todavía.
+    if (!fila.estado || !fila.estado.partida) return;
+    migrar(fila.estado);
+    estado = fila.estado;
+    pintar();
+  } catch (e) {
+    banda.classList.add('sin-conexion');
+    banda.textContent = 'Espejo sin conexión: el marcador puede estar viejo';
+  }
+}
+
+if (ESPEJO) {
+  document.body.classList.add('espejo');
+  bajarEstado();
+  setInterval(bajarEstado, CADENCIA_ESPEJO);
+}
 
 /* =================================================================
    Arranque

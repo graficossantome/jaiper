@@ -6,7 +6,7 @@
  * copia vieja pegada para siempre (que es lo que pasa con caché primero).
  */
 
-const CACHE = 'jaipur-v1';
+const CACHE = 'jaipur-v2';
 
 const ARCHIVOS = [
   '.',
@@ -35,6 +35,10 @@ self.addEventListener('activate', ev => {
 
 self.addEventListener('fetch', ev => {
   if (ev.request.method !== 'GET') return;
+
+  // El marcador compartido no se cachea nunca: una copia vieja del espejo sería
+  // peor que no tener ninguna, porque parecería estar al día.
+  if (ev.request.url.includes('.supabase.co')) return;
 
   ev.respondWith(
     fetch(ev.request)
