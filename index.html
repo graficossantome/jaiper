@@ -255,6 +255,24 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   background: var(--linea);
 }
 
+/* --- Aviso de guardado roto ------------------------------------ */
+
+.aviso-guardado {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border: 1px solid #b3261e;
+  border-radius: var(--radio);
+  background: color-mix(in srgb, #b3261e 10%, var(--papel));
+  font-size: .9rem;
+  line-height: 1.35;
+}
+
+@media (prefers-color-scheme: dark) {
+  .aviso-guardado { border-color: #f2b8b5; background: color-mix(in srgb, #f2b8b5 14%, var(--papel)); }
+}
+
+.aviso-guardado[hidden] { display: none; }
+
 /* --- Aviso de fin de ronda ------------------------------------- */
 
 .aviso {
@@ -373,6 +391,16 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Confirmación visual de que se registró: en iPhone no hay vibración para la
+   web, así que sin esto la única señal sería el propio texto cambiando. */
+.ultima-accion.pulso { animation: pulso 320ms ease; }
+
+@keyframes pulso {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.02); }
+  100% { transform: scale(1); }
 }
 
 .btn {
@@ -722,6 +750,8 @@ dialog > .btn { width: 100%; }
 </section>
 
 <main>
+  <p class="aviso-guardado" id="aviso-guardado" role="alert" hidden></p>
+
   <div class="aviso" id="aviso-fin" hidden>
     <p id="aviso-texto"></p>
     <button type="button" class="btn principal estrecho" id="btn-contar">Contar la ronda</button>
@@ -861,8 +891,34 @@ function persistir() {
   try {
     localStorage.setItem(CLAVE, JSON.stringify(estado));
   } catch (e) {
-    anunciar('No se pudo guardar en este navegador. La partida sigue en pantalla.');
+    avisarGuardadoRoto('Se acaba de intentar guardar y no se ha podido. La partida sigue en ' +
+      'pantalla, pero si cierras se pierde.');
   }
+}
+
+/**
+ * Abrir el archivo desde el visor del móvil, o en una pestaña privada, deja el
+ * guardado sin efecto: la app parecía funcionar y el historial se evaporaba al
+ * cerrar. Se comprueba escribiendo y releyendo de verdad, no mirando si existe
+ * localStorage, que existe igual aunque no conserve nada.
+ */
+function comprobarGuardado() {
+  try {
+    const clavePrueba = CLAVE + '-prueba';
+    localStorage.setItem(clavePrueba, '1');
+    const conserva = localStorage.getItem(clavePrueba) === '1';
+    localStorage.removeItem(clavePrueba);
+    if (!conserva) throw new Error('no conserva');
+  } catch (e) {
+    avisarGuardadoRoto('Este navegador no está guardando nada: al cerrar, la partida y el ' +
+      'historial se pierden. Abre la app desde su dirección web para que se conserve.');
+  }
+}
+
+function avisarGuardadoRoto(texto) {
+  const aviso = $('#aviso-guardado');
+  aviso.textContent = texto;
+  aviso.hidden = false;
 }
 
 function clonar(x) { return JSON.parse(JSON.stringify(x)); }
@@ -948,6 +1004,7 @@ function registrarVenta(j, idMercancia, cartas) {
   anunciar(`${JUGADORAS[j]} vende ${cartas} ${m.nombre.toLowerCase()} · ` +
     `${suma(fichas)}${ficha ? ` + ${ficha}` : ''} = ${suma(fichas) + ficha} rupias`);
 
+  acusarRecibo();
   if (nivel) mostrarBonus(j, ficha);
 }
 
@@ -973,6 +1030,7 @@ function cambiarCamellos(j, delta) {
   pintar();
   anunciar(`${JUGADORAS[j]} ${delta > 0 ? 'coge' : 'gasta'} ${Math.abs(delta)} ` +
     `${Math.abs(delta) === 1 ? 'camello' : 'camellos'} · rebaño ${t.camellos}`);
+  acusarRecibo();
 }
 
 /* =================================================================
@@ -1137,6 +1195,16 @@ function pintarMontones() {
 }
 
 function anunciar(texto) { $('#ultima-accion').textContent = texto; }
+
+/** Acuse de recibo de que la jugada quedó registrada, sin tener que mirar. */
+function acusarRecibo() {
+  // Safari de iPhone no implementa la API de vibración; ahí solo queda el pulso.
+  if (navigator.vibrate) navigator.vibrate(12);
+  const barra = $('#ultima-accion');
+  barra.classList.remove('pulso');
+  void barra.offsetWidth;   // fuerza el reflow para poder repetir la animación
+  barra.classList.add('pulso');
+}
 
 /* =================================================================
    Diálogos
@@ -1353,8 +1421,125 @@ function mostrarFinDePartida(campeona) {
       <button type="button" class="btn principal" data-cerrar>Otra partida</button>
       <button type="button" class="btn" data-abrir-stats>Estadísticas</button>
     </div>
+    <button type="button" class="enlace-sutil" data-compartir>Compartir el resultado</button>
   `);
+  prepararImagen(campeona, s);
   celebrar();
+}
+
+/* =================================================================
+   Imagen para compartir
+   ================================================================= */
+
+let imagenResultado = null;
+
+/**
+ * Se dibuja al abrir el diálogo de victoria, no al pulsar Compartir: en iOS,
+ * navigator.share exige el gesto del usuario y se pierde si antes hay un await.
+ * Con la imagen ya hecha, el botón comparte en el mismo instante del toque.
+ */
+function prepararImagen(campeona, s) {
+  imagenResultado = null;
+  const lienzo = document.createElement('canvas');
+  lienzo.width = 1080;
+  lienzo.height = 1350;
+  const c = lienzo.getContext('2d');
+  const centro = lienzo.width / 2;
+
+  // Paleta clara siempre: la imagen sale del móvil y no depende del tema de nadie
+  const papel = '#fbf6ee', tinta = '#241813', suave = '#6d5749', linea = '#e0d1bf';
+  const fuente = (peso, tam) => `${peso} ${tam}px "Avenir Next", Avenir, system-ui, sans-serif`;
+
+  c.fillStyle = papel;
+  c.fillRect(0, 0, lienzo.width, lienzo.height);
+  c.textAlign = 'center';
+
+  c.fillStyle = suave;
+  c.font = fuente(600, 34);
+  c.letterSpacing = '10px';
+  c.fillText('J A I P U R', centro, 150);
+  c.letterSpacing = '0px';
+
+  c.font = fuente(500, 30);
+  c.fillText(new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }), centro, 205);
+
+  c.fillStyle = tinta;
+  c.font = fuente(700, 96);
+  c.fillText(`Gana ${JUGADORAS[campeona]}`, centro, 400);
+
+  c.strokeStyle = linea;
+  c.lineWidth = 2;
+  c.beginPath();
+  c.moveTo(160, 470); c.lineTo(920, 470);
+  c.stroke();
+
+  const partida = estado.historial[0];
+  c.fillStyle = suave;
+  c.font = fuente(500, 34);
+  c.fillText('Rondas de la partida', centro, 540);
+
+  c.fillStyle = tinta;
+  c.font = fuente(600, 46);
+  partida.rondas.forEach((r, i) => {
+    c.fillText(`Ronda ${i + 1}   ${r.puntos[0]} — ${r.puntos[1]}`, centro, 615 + i * 70);
+  });
+
+  const baseDuelo = 630 + partida.rondas.length * 70 + 90;
+  c.strokeStyle = linea;
+  c.beginPath();
+  c.moveTo(160, baseDuelo - 60); c.lineTo(920, baseDuelo - 60);
+  c.stroke();
+
+  c.fillStyle = suave;
+  c.font = fuente(500, 34);
+  c.fillText('Partidas ganadas', centro, baseDuelo);
+
+  // Cada cifra con su nombre debajo, en columnas fijas: escritos de una tirada,
+  // los nombres quedaban descolocados respecto a su número.
+  const columna = 200;
+  c.fillStyle = tinta;
+  c.font = fuente(700, 150);
+  c.fillText(String(s.partidas[0]), centro - columna, baseDuelo + 150);
+  c.fillText(String(s.partidas[1]), centro + columna, baseDuelo + 150);
+  c.font = fuente(400, 90);
+  c.fillText('—', centro, baseDuelo + 145);
+
+  c.fillStyle = suave;
+  c.font = fuente(600, 38);
+  c.fillText(JUGADORAS[0], centro - columna, baseDuelo + 215);
+  c.fillText(JUGADORAS[1], centro + columna, baseDuelo + 215);
+
+  c.fillStyle = '#b02a5b';
+  c.font = fuente(500, 44);
+  c.fillText('♥', centro, lienzo.height - 90);
+
+  lienzo.toBlob(blob => {
+    if (!blob) return;
+    imagenResultado = new File([blob], `jaipur-${new Date().toISOString().slice(0, 10)}.png`,
+      { type: 'image/png' });
+  }, 'image/png');
+}
+
+async function compartirResultado() {
+  if (!imagenResultado) return;
+  const datos = { files: [imagenResultado], title: 'Jaipur' };
+
+  if (navigator.canShare && navigator.canShare(datos)) {
+    try {
+      await navigator.share(datos);
+    } catch (e) {
+      /* cancelar el compartir no es un error */
+    }
+    return;
+  }
+
+  // Sin API de compartir (escritorio, navegadores viejos), se descarga
+  const url = URL.createObjectURL(imagenResultado);
+  const enlace = document.createElement('a');
+  enlace.href = url;
+  enlace.download = imagenResultado.name;
+  enlace.click();
+  URL.revokeObjectURL(url);
 }
 
 function celebrar() {
@@ -1774,6 +1959,8 @@ document.addEventListener('click', ev => {
     return;
   }
 
+  if (t.hasAttribute('data-compartir')) { compartirResultado(); return; }
+
   // --- Confirmación propia
   if (t.hasAttribute('data-confirmar')) {
     $('#dlg-confirmar').close();
@@ -1810,6 +1997,7 @@ $('#dlg-venta').addEventListener('close', () => { ventaEnCurso = null; });
    Arranque
    ================================================================= */
 
+comprobarGuardado();
 // Se guarda ya, sin esperar a la primera jugada: así los montones de bonus que se
 // acaban de barajar son los mismos si se recarga la página antes de tocar nada.
 persistir();
