@@ -18,7 +18,20 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Jaipur">
 <meta name="mobile-web-app-capable" content="yes">
+<link rel="preload" href="inter.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+/* Inter variable, subconjunto latino, servida desde la propia app.
+   font-display: swap para que el marcador se lea desde el primer instante
+   aunque la fuente tarde: en una partida, texto invisible es peor que texto
+   con la tipografía del sistema durante un parpadeo. */
+@font-face {
+  font-family: Inter;
+  src: url('inter.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ---------------------------------------------------------------
    Paleta de papel e tinta: el fondo es papel cálido, no un gris de
    panel, y las superficies se separan con filete de 1px en vez de
@@ -39,10 +52,11 @@
   --oro: #9c6a12;
   --foco: #0b57d0;
 
-  /* Avenir Next está en el Mac y en el iPhone de Simi y es la más moderna que se
-     puede usar sin descargar nada; detrás, la del sistema. Nada de fuentes web:
-     la app tiene que abrir sin conexión. */
-  --sans: "Avenir Next", Avenir, system-ui, -apple-system, "Segoe UI Variable", "Segoe UI", Roboto, sans-serif;
+  /* Inter viaja dentro de la app, en el repo y en el caché del service worker: no
+     se pide a ningún servidor de fuentes, así que sigue abriendo sin conexión.
+     Antes se pedía Avenir Next, que está en el iPhone pero no en Android, y las
+     dos jugadoras veían tipografías distintas. */
+  --sans: Inter, system-ui, -apple-system, "Segoe UI Variable", "Segoe UI", Roboto, sans-serif;
 
   --radio: 18px;
   --transicion: 140ms ease;

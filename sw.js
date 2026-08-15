@@ -6,12 +6,13 @@
  * copia vieja pegada para siempre (que es lo que pasa con caché primero).
  */
 
-const CACHE = 'jaipur-v3';
+const CACHE = 'jaipur-v4';
 
 const ARCHIVOS = [
   '.',
   'index.html',
   'manifest.webmanifest',
+  'inter.woff2',
   'icono-192.png',
   'icono-512.png',
   'icono-180.png'
