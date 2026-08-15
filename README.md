@@ -70,7 +70,8 @@ montones o el mazo. Los empates se resuelven por fichas de bonus y después por 
 La partida es de quien logre dos sellos de excelencia.
 
 Las **fichas de bonus las reparte la app**: monta los tres montones al empezar cada ronda, los
-baraja y roba la de arriba en cada venta de 3 o más, así que las de cartón se quedan en la caja.
+baraja y roba la de arriba en cada venta de 3 o más, así que las de cartón se quedan en la caja. No
+se muestra cuántas quedan en cada montón.
 
 | Montón | Fichas |
 | --- | --- |

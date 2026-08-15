@@ -30,13 +30,14 @@
   --linea-fuerte: #cbb59d;
   --tinta: #241813;
   --tinta-suave: #6d5749;
-  --simi: #b02a5b;
-  --ines: #0f6b5c;
+  --acento: #b02a5b;
   --oro: #9c6a12;
   --foco: #0b57d0;
 
-  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
-  --sans: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* Avenir Next está en el Mac y en el iPhone de Simi y es la más moderna que se
+     puede usar sin descargar nada; detrás, la del sistema. Nada de fuentes web:
+     la app tiene que abrir sin conexión. */
+  --sans: "Avenir Next", Avenir, system-ui, -apple-system, "Segoe UI Variable", "Segoe UI", Roboto, sans-serif;
 
   --radio: 18px;
   --transicion: 140ms ease;
@@ -51,8 +52,7 @@
     --linea-fuerte: #564137;
     --tinta: #f3e7dc;
     --tinta-suave: #b9a294;
-    --simi: #ff9db8;
-    --ines: #63d8c1;
+    --acento: #ff9db8;
     --oro: #e0ae5b;
     --foco: #9ec2ff;
   }
@@ -72,7 +72,7 @@ body {
   overscroll-behavior-y: contain;
 }
 
-h1, h2, h3 { line-height: 1.15; margin: 0; font-family: var(--serif); font-weight: 600; }
+h1, h2, h3 { line-height: 1.12; margin: 0; font-weight: 700; letter-spacing: -.02em; }
 
 button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
 
@@ -98,8 +98,8 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0 -14px 14px;
-  padding: max(14px, calc(env(safe-area-inset-top) + 6px)) 18px 14px;
+  margin: 0 -14px 12px;
+  padding: max(7px, calc(env(safe-area-inset-top) + 3px)) 16px 7px;
   border-bottom: 1px solid var(--linea);
   overflow: hidden;
 }
@@ -121,18 +121,16 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 .cabecera h1 {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 1.5rem;
-  letter-spacing: -.015em;
+  gap: 7px;
+  font-size: 1.12rem;
 }
 
-.corazon { width: 17px; height: 17px; fill: var(--simi); }
+.corazon { width: 13px; height: 13px; fill: var(--acento); }
 
 .ronda {
   margin: 0 0 0 auto;
-  font-family: var(--serif);
-  font-size: .92rem;
-  font-style: italic;
+  font-size: .82rem;
+  font-weight: 500;
   color: var(--tinta-suave);
 }
 
@@ -141,10 +139,11 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   place-items: center;
   min-width: 44px;
   min-height: 44px;
+  margin-block: -6px;
   border-radius: 50%;
-  border: 1px solid var(--linea);
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   letter-spacing: .1em;
+  color: var(--tinta-suave);
 }
 
 /* --- Marcador: un bloque partido, no dos tarjetas flotando ----- */
@@ -158,9 +157,8 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   overflow: hidden;
 }
 
-.jugadora { padding: 10px 12px 9px; }
-.jugadora[data-j="0"] { --color-j: var(--simi); }
-.jugadora[data-j="1"] { --color-j: var(--ines); border-left: 1px solid var(--linea); }
+.jugadora { padding: 10px 12px 9px; min-width: 0; }
+.jugadora[data-j="1"] { border-left: 1px solid var(--linea); }
 
 /* Nombre y sellos comparten renglón; el filete doble es el acento de color,
    en vez de la barra superior de plantilla que traía la primera versión. */
@@ -169,55 +167,49 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding-bottom: 5px;
-  border-bottom: 3px double color-mix(in srgb, var(--color-j) 55%, transparent);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--linea);
 }
 
 .jugadora h2 {
-  font-size: 1.05rem;
-  color: var(--color-j);
-  letter-spacing: .01em;
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--tinta-suave);
+  letter-spacing: 0;
 }
 
 .rupias {
   margin: 0;
-  font-family: var(--serif);
-  font-size: 1.85rem;
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: -.02em;
+  font-size: 3.7rem;
+  font-weight: 700;
+  line-height: .95;
+  letter-spacing: -.045em;
   font-variant-numeric: tabular-nums lining-nums;
 }
 
-.rupias small {
-  font-family: var(--sans);
-  font-size: .72rem;
-  font-weight: 600;
-  color: var(--tinta-suave);
-  margin-inline-start: 5px;
-  letter-spacing: .02em;
-}
+/* Con tres cifras, la mitad del cuadro no da de sí y el marcador desbordaba
+   la pantalla en móviles de 375 px. Se encoge solo cuando hace falta. */
+.rupias.larga { font-size: 2.7rem; }
 
 .pie-jugadora {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 .sellos { display: flex; gap: 5px; margin: 0; }
 
-/* Rombos, no círculos: rima con la gema del icono y con el tema del juego */
 .sello {
   width: 11px;
   height: 11px;
-  transform: rotate(45deg);
-  border: 1.5px solid var(--color-j);
-  opacity: .45;
+  border-radius: 50%;
+  border: 1.5px solid var(--tinta-suave);
+  opacity: .5;
 }
 
-.sello.ganado { background: var(--color-j); opacity: 1; }
+.sello.ganado { background: var(--tinta); border-color: var(--tinta); opacity: 1; }
 
 .btn-rebano {
   display: flex;
@@ -234,7 +226,6 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 }
 
 .btn-rebano b {
-  font-family: var(--serif);
   font-size: 1.15rem;
   font-weight: 600;
   color: var(--tinta);
@@ -248,11 +239,11 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 22px 0 10px;
-  font-size: 1rem;
-  font-style: italic;
+  margin: 18px 0 10px;
+  font-size: .9rem;
   color: var(--tinta-suave);
-  font-weight: 400;
+  font-weight: 600;
+  letter-spacing: -.01em;
 }
 
 .titulo-seccion::after {
@@ -316,46 +307,30 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 .fichas {
   display: flex;
   flex-wrap: wrap;
-  gap: 1px;
+  gap: 3px;
   justify-content: flex-start;
 }
 
-/* Fichas en rombo, como las gemas del juego. El rombo lo dibuja un
-   pseudo-elemento girado dentro de la caja: girar la ficha entera haría que su
-   diagonal ocupase un 41 % más de ancho y las nueve de cuero no cabrían. */
+/* Relleno sólido: sobre la fila teñida, una ficha hueca se perdía */
 .ficha {
-  position: relative;
   width: 34px;
   height: 34px;
   display: grid;
   place-items: center;
+  border-radius: 50%;
+  background: var(--papel-alto);
+  border: 1px solid color-mix(in srgb, var(--tono) 55%, transparent);
   color: var(--tinta);
   font-size: 1rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
-/* Relleno sólido: sobre la fila teñida, un rombo hueco se perdía */
-.ficha::before {
-  content: "";
-  position: absolute;
-  inset: 6px;
-  background: var(--papel-alto);
-  border: 1px solid color-mix(in srgb, var(--tono) 55%, transparent);
-  border-radius: 3px;
-  transform: rotate(45deg);
-}
-
-/* El número va en su propio span posicionado: el rombo es un elemento absoluto
-   y, sin esto, se pintaría por encima de la cifra. */
-.ficha .valor-ficha { position: relative; z-index: 1; }
-
-.ficha.siguiente { font-weight: 700; }
-
-.ficha.siguiente::before {
+.ficha.siguiente {
   border-width: 2px;
   border-color: color-mix(in srgb, var(--tono) 90%, transparent);
   background: color-mix(in srgb, var(--tono) 26%, var(--papel-alto));
+  font-weight: 700;
 }
 
 .monton.agotado { opacity: .55; }
@@ -363,32 +338,8 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 .agotado-txt {
   margin-inline-start: auto;
   font-size: .85rem;
-  font-style: italic;
   color: var(--tinta-suave);
 }
-
-/* --- Bonus que queda ------------------------------------------- */
-
-.bonus-restante {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 18px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font-size: .88rem;
-  color: var(--tinta-suave);
-}
-
-.bonus-restante b {
-  font-family: var(--serif);
-  font-size: 1.05rem;
-  color: var(--tinta);
-  margin-inline-start: 4px;
-}
-
-.bonus-restante li.vacia { opacity: .45; }
-.bonus-restante li.vacia b { text-decoration: line-through; }
 
 /* --- Barra inferior -------------------------------------------- */
 
@@ -418,13 +369,6 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 .btn[disabled] { opacity: .4; cursor: default; }
 .btn.estrecho { flex: 0 1 auto; }
 .btn.principal { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
-.btn.simi { background: var(--simi); color: #fff; border-color: var(--simi); }
-.btn.ines { background: var(--ines); color: #fff; border-color: var(--ines); }
-
-@media (prefers-color-scheme: dark) {
-  .btn.simi, .btn.ines { color: #16100e; }
-}
-
 /* --- Diálogos --------------------------------------------------- */
 
 dialog {
@@ -457,8 +401,6 @@ fieldset { border: 0; margin: 0 0 16px; padding: 0; }
 
 legend {
   padding: 0;
-  font-family: var(--serif);
-  font-style: italic;
   font-size: .95rem;
   color: var(--tinta-suave);
   margin-bottom: 8px;
@@ -518,7 +460,6 @@ dialog > .btn { width: 100%; }
 .cuenta {
   margin: 0 0 16px;
   text-align: center;
-  font-family: var(--serif);
   font-size: 3.4rem;
   font-weight: 600;
   line-height: 1;
@@ -527,7 +468,6 @@ dialog > .btn { width: 100%; }
 
 .cuenta small {
   display: block;
-  font-family: var(--sans);
   font-size: .78rem;
   font-weight: 500;
   color: var(--tinta-suave);
@@ -558,7 +498,6 @@ dialog > .btn { width: 100%; }
 }
 
 .aviso-bonus .cifra-bonus {
-  font-family: var(--serif);
   font-size: 2rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
@@ -581,8 +520,6 @@ dialog > .btn { width: 100%; }
 
 .recuento caption, .tabla caption {
   text-align: start;
-  font-family: var(--serif);
-  font-style: italic;
   color: var(--tinta-suave);
   padding-bottom: 8px;
 }
@@ -596,17 +533,13 @@ dialog > .btn { width: 100%; }
 
 .recuento th[scope="row"], .tabla th[scope="row"] {
   text-align: start;
-  font-family: var(--sans);
   font-weight: 500;
   color: var(--tinta-suave);
 }
 
-.recuento thead th, .tabla thead th { font-family: var(--sans); font-size: .82rem; font-weight: 600; }
-.recuento thead th:nth-child(2), .tabla thead th:nth-child(2) { color: var(--simi); }
-.recuento thead th:nth-child(3), .tabla thead th:nth-child(3) { color: var(--ines); }
+.recuento thead th, .tabla thead th { font-size: .82rem; font-weight: 600; }
 
 .recuento .total td, .recuento .total th {
-  font-family: var(--serif);
   font-weight: 600;
   font-size: 1.3rem;
   border-bottom: 0;
@@ -621,7 +554,7 @@ dialog > .btn { width: 100%; }
   text-align: center;
 }
 
-.veredicto .quien { font-family: var(--serif); font-size: 1.45rem; margin: 0; }
+.veredicto .quien { font-size: 1.35rem; font-weight: 700; margin: 0; }
 .veredicto .porque { margin: 6px 0 0; font-size: .88rem; color: var(--tinta-suave); }
 
 /* --- Duelo y datos ----------------------------------------------- */
@@ -638,17 +571,14 @@ dialog > .btn { width: 100%; }
 }
 
 .duelo .cifra {
-  font-family: var(--serif);
   font-size: 3.1rem;
   font-weight: 600;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 
-.duelo .cifra.simi { color: var(--simi); }
-.duelo .cifra.ines { color: var(--ines); }
 .duelo .quien { display: block; font-size: .8rem; color: var(--tinta-suave); margin-top: 6px; }
-.duelo .vs { font-family: var(--serif); font-style: italic; font-size: .85rem; color: var(--tinta-suave); }
+.duelo .vs { font-size: .8rem; font-weight: 500; color: var(--tinta-suave); }
 
 .datos { list-style: none; margin: 0 0 16px; padding: 0; }
 
@@ -668,7 +598,6 @@ dialog > .btn { width: 100%; }
 .vacio {
   text-align: center;
   color: var(--tinta-suave);
-  font-style: italic;
   padding: 26px 10px;
 }
 
@@ -691,13 +620,9 @@ dialog > .btn { width: 100%; }
 .partidas .fecha { font-size: .82rem; color: var(--tinta-suave); }
 
 .partidas .resultado {
-  font-family: var(--serif);
   font-size: 1.05rem;
   font-weight: 600;
 }
-
-.partidas .resultado.simi { color: var(--simi); }
-.partidas .resultado.ines { color: var(--ines); }
 
 .partidas .rondas {
   margin: 6px 0 0;
@@ -753,7 +678,7 @@ dialog > .btn { width: 100%; }
       <p class="sellos" id="sellos-0"></p>
     </div>
     <div class="pie-jugadora">
-      <p class="rupias"><span id="rupias-0">0</span><small>rupias</small></p>
+      <p class="rupias"><span id="rupias-0">0</span><span class="visualmente-oculta">rupias</span></p>
       <button type="button" class="btn-rebano" data-camellos="0">
         <span aria-hidden="true">🐫</span> <b id="camellos-0">0</b>
         <span class="visualmente-oculta">camellos de Simi, pulsa para cambiar</span>
@@ -766,7 +691,7 @@ dialog > .btn { width: 100%; }
       <p class="sellos" id="sellos-1"></p>
     </div>
     <div class="pie-jugadora">
-      <p class="rupias"><span id="rupias-1">0</span><small>rupias</small></p>
+      <p class="rupias"><span id="rupias-1">0</span><span class="visualmente-oculta">rupias</span></p>
       <button type="button" class="btn-rebano" data-camellos="1">
         <span aria-hidden="true">🐫</span> <b id="camellos-1">0</b>
         <span class="visualmente-oculta">camellos de Inés, pulsa para cambiar</span>
@@ -783,9 +708,6 @@ dialog > .btn { width: 100%; }
 
   <h2 class="titulo-seccion">Mercancías</h2>
   <ul class="montones" id="montones"></ul>
-
-  <h2 class="titulo-seccion">Bonus por repartir</h2>
-  <ul class="bonus-restante" id="bonus-restante"></ul>
 </main>
 
 <footer class="barra">
@@ -1116,7 +1038,9 @@ function pintar() {
 
   const lider = lideraCamellos();
   for (const j of [0, 1]) {
-    $(`#rupias-${j}`).textContent = rupias(j);
+    const cifra = rupias(j);
+    $(`#rupias-${j}`).textContent = cifra;
+    $(`#rupias-${j}`).parentElement.classList.toggle('larga', String(cifra).length >= 3);
     $(`#camellos-${j}`).textContent = p.tomado[j].camellos;
 
     const sellos = $(`#sellos-${j}`);
@@ -1140,7 +1064,6 @@ function pintar() {
   }
 
   pintarMontones();
-  pintarBonusRestante();
 
   const aviso = $('#aviso-fin');
   aviso.hidden = !rondaTerminada();
@@ -1174,10 +1097,7 @@ function pintarMontones() {
       restantes.forEach((v, i) => {
         const f = document.createElement('span');
         f.className = 'ficha' + (i === 0 ? ' siguiente' : '');
-        const valor = document.createElement('span');
-        valor.className = 'valor-ficha';
-        valor.textContent = v;
-        f.appendChild(valor);
+        f.textContent = v;
         fichas.appendChild(f);
       });
       btn.appendChild(fichas);
@@ -1190,20 +1110,6 @@ function pintarMontones() {
 
     // El contador cabe en el aria-label; en pantalla lo dicen las propias monedas.
     li.appendChild(btn);
-    lista.appendChild(li);
-  }
-}
-
-/* Saber cuántas fichas gordas siguen vivas cambia cómo se juega, y con la app
-   haciendo de montón ya no se ve el grosor de la pila en la mesa. */
-function pintarBonusRestante() {
-  const lista = $('#bonus-restante');
-  lista.innerHTML = '';
-  for (const n of [3, 4, 5]) {
-    const quedan = estado.partida.bonusPilas[n].length;
-    const li = document.createElement('li');
-    if (!quedan) li.className = 'vacia';
-    li.innerHTML = `${n === 5 ? '5 o más' : n} cartas <b>${quedan}</b>`;
     lista.appendChild(li);
   }
 }
@@ -1252,8 +1158,8 @@ function abrirVenta(idMercancia) {
     <fieldset>
       <legend>¿Quién vende?</legend>
       <div class="acciones">
-        <button type="button" class="btn simi" data-vende="0">${JUGADORAS[0]}</button>
-        <button type="button" class="btn ines" data-vende="1">${JUGADORAS[1]}</button>
+        <button type="button" class="btn principal" data-vende="0">${JUGADORAS[0]}</button>
+        <button type="button" class="btn principal" data-vende="1">${JUGADORAS[1]}</button>
       </div>
     </fieldset>
     <button type="button" class="enlace-sutil" data-cerrar>Cancelar</button>
@@ -1366,8 +1272,8 @@ function pintarRecuento() {
           El reglamento no lo resuelve, así que lo decidís vosotras.</p>
       </div>
       <div class="acciones">
-        <button type="button" class="btn simi" data-cerrar-ronda="0">Sello para ${JUGADORAS[0]}</button>
-        <button type="button" class="btn ines" data-cerrar-ronda="1">Sello para ${JUGADORAS[1]}</button>
+        <button type="button" class="btn" data-cerrar-ronda="0">Sello para ${JUGADORAS[0]}</button>
+        <button type="button" class="btn" data-cerrar-ronda="1">Sello para ${JUGADORAS[1]}</button>
       </div>
       <button type="button" class="enlace-sutil" data-cerrar-ronda="ninguna">Ronda sin sello</button>`;
   }
@@ -1410,9 +1316,9 @@ function mostrarFinDePartida(campeona) {
     <h2 id="ronda-titulo">Gana ${JUGADORAS[campeona]}</h2>
     <p class="sub">Dos sellos de excelencia. Queda guardado en el cara a cara.</p>
     <div class="duelo">
-      <div><span class="cifra simi">${s.partidas[0]}</span><span class="quien">${JUGADORAS[0]}</span></div>
+      <div><span class="cifra" data-j="0">${s.partidas[0]}</span><span class="quien">${JUGADORAS[0]}</span></div>
       <span class="vs">partidas</span>
-      <div><span class="cifra ines">${s.partidas[1]}</span><span class="quien">${JUGADORAS[1]}</span></div>
+      <div><span class="cifra" data-j="1">${s.partidas[1]}</span><span class="quien">${JUGADORAS[1]}</span></div>
     </div>
     <div class="acciones">
       <button type="button" class="btn principal" data-cerrar>Otra partida</button>
@@ -1430,7 +1336,7 @@ function celebrar() {
   // Un <dialog> modal vive en la top layer: el confeti tiene que colgar de él o
   // el fondo oscuro del propio diálogo lo tapa entero.
   const anfitrion = document.querySelector('dialog[open]') || document.body;
-  const colores = ['#b02a5b', '#d6a41f', '#0f6b5c', '#c8552f', '#8d6bb8'];
+  const colores = ['#c0392b', '#cf9a12', '#4f8f3f', '#7d5aa8', '#8a6141'];
   for (let i = 0; i < 40; i++) {
     const trozo = document.createElement('i');
     trozo.style.left = Math.random() * 100 + '%';
@@ -1590,9 +1496,9 @@ function abrirEstadisticas() {
     <h2 id="stats-titulo">El cara a cara</h2>
     <p class="sub">Todo lo que habéis jugado desde que existe esta app.</p>
     <div class="duelo">
-      <div><span class="cifra simi">${s.partidas[0]}</span><span class="quien">${JUGADORAS[0]}</span></div>
+      <div><span class="cifra" data-j="0">${s.partidas[0]}</span><span class="quien">${JUGADORAS[0]}</span></div>
       <span class="vs">partidas<br>ganadas</span>
-      <div><span class="cifra ines">${s.partidas[1]}</span><span class="quien">${JUGADORAS[1]}</span></div>
+      <div><span class="cifra" data-j="1">${s.partidas[1]}</span><span class="quien">${JUGADORAS[1]}</span></div>
     </div>
     <ul class="datos">
       ${filas.map(([k, v]) => `<li><span class="etiqueta">${k}</span><span class="valor">${v}</span></li>`).join('')}
@@ -1626,7 +1532,7 @@ function abrirHistorial() {
     return `
       <li>
         <div class="cabeza">
-          <span class="resultado ${p.ganadora === 0 ? 'simi' : 'ines'}">
+          <span class="resultado">
             Ganó ${JUGADORAS[p.ganadora]} · ${p.sellos[0]}—${p.sellos[1]}
           </span>
           <span class="fecha">${fechaCorta(p.fecha)}</span>
