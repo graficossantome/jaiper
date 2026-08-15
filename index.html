@@ -158,7 +158,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   overflow: hidden;
 }
 
-.jugadora { padding: 12px 14px 10px; }
+.jugadora { padding: 11px 12px 9px; }
 .jugadora[data-j="0"] { --color-j: var(--simi); }
 .jugadora[data-j="1"] { --color-j: var(--ines); border-left: 1px solid var(--linea); }
 
@@ -180,9 +180,9 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 }
 
 .rupias {
-  margin: 8px 0 0;
+  margin: 6px 0 0;
   font-family: var(--serif);
-  font-size: 2.9rem;
+  font-size: 2.4rem;
   font-weight: 600;
   line-height: 1;
   letter-spacing: -.02em;
@@ -201,9 +201,9 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 .pie-jugadora {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  margin-top: 10px;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 8px;
 }
 
 .sellos { display: flex; gap: 5px; margin: 0; }
@@ -297,9 +297,9 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 60px;
-  padding: 10px 14px;
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 14px;
   text-align: start;
   transition: background var(--transicion);
 }
@@ -308,42 +308,34 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 
 .simbolo {
   flex: 0 0 auto;
-  width: 26px;
-  height: 26px;
+  width: 34px;
+  height: 34px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  font-size: .9rem;
+  font-size: 1.2rem;
   line-height: 1;
   background: color-mix(in srgb, var(--tono) 18%, transparent);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tono) 45%, transparent);
 }
 
-.monton-nombre {
-  font-family: var(--serif);
-  font-size: 1.05rem;
-  font-weight: 600;
-  min-width: 4.4em;
-}
-
 .fichas {
   display: flex;
   flex-wrap: wrap;
-  gap: 2px;
-  margin-inline-start: auto;
-  justify-content: flex-end;
+  gap: 4px;
+  justify-content: flex-start;
 }
 
 /* Las fichas son monedas: redondas, con su filete y su número tabular */
 .ficha {
-  width: 21px;
-  height: 21px;
+  width: 28px;
+  height: 28px;
   display: grid;
   place-items: center;
   border-radius: 50%;
   border: 1px solid var(--linea-fuerte);
   color: var(--tinta-suave);
-  font-size: .72rem;
+  font-size: .95rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -355,7 +347,6 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 }
 
 .monton.agotado .simbolo { opacity: .4; }
-.monton.agotado .monton-nombre { color: var(--tinta-suave); }
 
 .agotado-txt {
   margin-inline-start: auto;
@@ -1165,11 +1156,6 @@ function pintarMontones() {
     simbolo.textContent = m.emoji;
     simbolo.setAttribute('aria-hidden', 'true');
     btn.appendChild(simbolo);
-
-    const nombre = document.createElement('span');
-    nombre.className = 'monton-nombre';
-    nombre.textContent = m.nombre;
-    btn.appendChild(nombre);
 
     if (restantes.length) {
       const fichas = document.createElement('span');
