@@ -167,7 +167,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding-bottom: 6px;
+  padding-bottom: 4px;
   border-bottom: 1px solid var(--linea);
 }
 
@@ -180,7 +180,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 
 .rupias {
   margin: 0;
-  font-size: 3.7rem;
+  font-size: 4.9rem;
   font-weight: 700;
   line-height: .95;
   letter-spacing: -.045em;
@@ -189,7 +189,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 
 /* Con tres cifras, la mitad del cuadro no da de sí y el marcador desbordaba
    la pantalla en móviles de 375 px. Se encoge solo cuando hace falta. */
-.rupias.larga { font-size: 2.7rem; }
+.rupias.larga { font-size: 3.3rem; }
 
 .pie-jugadora {
   display: flex;
@@ -199,7 +199,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   margin-top: 6px;
 }
 
-.sellos { display: flex; gap: 5px; margin: 0; }
+.sellos { display: flex; gap: 5px; margin: 0 0 8px; }
 
 .sello {
   width: 11px;
@@ -213,25 +213,28 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 
 .btn-rebano {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 5px;
   min-height: 44px;
-  /* Sin la palabra «rebaño» el botón se quedaba en 38px de ancho, por debajo del mínimo táctil */
   min-width: 44px;
-  justify-content: flex-end;
-  padding: 0 6px;
-  font-size: .8rem;
+  margin-block: -6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--linea-fuerte);
+  background: var(--papel-hundido);
+  font-size: 1.1rem;
   color: var(--tinta-suave);
   font-variant-numeric: tabular-nums;
 }
 
 .btn-rebano b {
-  font-size: 1.15rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: var(--tinta);
+  letter-spacing: -.02em;
 }
 
-.btn-rebano .lidera { color: var(--oro); font-weight: 700; }
+.btn-rebano .lidera { font-size: .8rem; color: var(--oro); font-weight: 700; }
 
 /* --- Encabezados de sección con filete ------------------------- */
 
@@ -675,27 +678,27 @@ dialog > .btn { width: 100%; }
   <article class="jugadora" data-j="0">
     <div class="cabeza-jugadora">
       <h2>Simi</h2>
-      <p class="sellos" id="sellos-0"></p>
-    </div>
-    <div class="pie-jugadora">
-      <p class="rupias"><span id="rupias-0">0</span><span class="visualmente-oculta">rupias</span></p>
       <button type="button" class="btn-rebano" data-camellos="0">
         <span aria-hidden="true">🐫</span> <b id="camellos-0">0</b>
         <span class="visualmente-oculta">camellos de Simi, pulsa para cambiar</span>
       </button>
     </div>
+    <div class="pie-jugadora">
+      <p class="rupias"><span id="rupias-0">0</span><span class="visualmente-oculta">rupias</span></p>
+      <p class="sellos" id="sellos-0"></p>
+    </div>
   </article>
   <article class="jugadora" data-j="1">
     <div class="cabeza-jugadora">
       <h2>Inés</h2>
-      <p class="sellos" id="sellos-1"></p>
-    </div>
-    <div class="pie-jugadora">
-      <p class="rupias"><span id="rupias-1">0</span><span class="visualmente-oculta">rupias</span></p>
       <button type="button" class="btn-rebano" data-camellos="1">
         <span aria-hidden="true">🐫</span> <b id="camellos-1">0</b>
         <span class="visualmente-oculta">camellos de Inés, pulsa para cambiar</span>
       </button>
+    </div>
+    <div class="pie-jugadora">
+      <p class="rupias"><span id="rupias-1">0</span><span class="visualmente-oculta">rupias</span></p>
+      <p class="sellos" id="sellos-1"></p>
     </div>
   </article>
 </section>
