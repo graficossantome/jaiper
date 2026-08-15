@@ -62,7 +62,7 @@
 
 body {
   margin: 0;
-  padding: 0 max(14px, env(safe-area-inset-left)) calc(112px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-right));
+  padding: 0 max(14px, env(safe-area-inset-left)) calc(150px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-right));
   background: var(--papel);
   color: var(--tinta);
   font-family: var(--sans);
@@ -167,7 +167,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding-bottom: 4px;
+  padding-bottom: 6px;
   border-bottom: 1px solid var(--linea);
 }
 
@@ -180,7 +180,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 
 .rupias {
   margin: 0;
-  font-size: 4.9rem;
+  font-size: 3.7rem;
   font-weight: 700;
   line-height: .95;
   letter-spacing: -.045em;
@@ -189,7 +189,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 
 /* Con tres cifras, la mitad del cuadro no da de sí y el marcador desbordaba
    la pantalla en móviles de 375 px. Se encoge solo cuando hace falta. */
-.rupias.larga { font-size: 3.3rem; }
+.rupias.larga { font-size: 2.3rem; }
 
 .pie-jugadora {
   display: flex;
@@ -199,7 +199,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   margin-top: 6px;
 }
 
-.sellos { display: flex; gap: 5px; margin: 0 0 8px; }
+.sellos { display: flex; gap: 5px; margin: 0; }
 
 .sello {
   width: 11px;
@@ -217,18 +217,17 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   gap: 5px;
   min-height: 44px;
   min-width: 44px;
-  margin-block: -6px;
-  padding: 3px 10px;
+  padding: 2px 9px;
   border-radius: 999px;
   border: 1px solid var(--linea-fuerte);
   background: var(--papel-hundido);
-  font-size: 1.1rem;
+  font-size: .95rem;
   color: var(--tinta-suave);
   font-variant-numeric: tabular-nums;
 }
 
 .btn-rebano b {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--tinta);
   letter-spacing: -.02em;
@@ -350,11 +349,30 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   position: fixed;
   inset: auto 0 0 0;
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 8px;
   padding: 10px max(14px, env(safe-area-inset-left)) calc(10px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-right));
   background: color-mix(in srgb, var(--papel) 90%, transparent);
   backdrop-filter: blur(12px);
   border-top: 1px solid var(--linea);
+}
+
+.botones { display: flex; gap: 10px; }
+
+/* La misma línea que anuncian los lectores de pantalla, ahora también a la vista:
+   sirve para comprobar de un vistazo que lo último que se tocó fue lo correcto. */
+.ultima-accion {
+  margin: 0;
+  padding: 7px 12px;
+  border: 1px solid var(--linea);
+  border-radius: 10px;
+  background: var(--papel-hundido);
+  color: var(--tinta-suave);
+  font-size: .84rem;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .btn {
@@ -482,7 +500,7 @@ dialog > .btn { width: 100%; }
 .aviso-bonus {
   position: fixed;
   left: 50%;
-  bottom: calc(86px + env(safe-area-inset-bottom));
+  bottom: calc(124px + env(safe-area-inset-bottom));
   z-index: 20;
   display: flex;
   align-items: center;
@@ -678,27 +696,27 @@ dialog > .btn { width: 100%; }
   <article class="jugadora" data-j="0">
     <div class="cabeza-jugadora">
       <h2>Simi</h2>
+      <p class="sellos" id="sellos-0"></p>
+    </div>
+    <div class="pie-jugadora">
+      <p class="rupias"><span id="rupias-0">0</span><span class="visualmente-oculta">rupias</span></p>
       <button type="button" class="btn-rebano" data-camellos="0">
         <span aria-hidden="true">🐫</span> <b id="camellos-0">0</b>
         <span class="visualmente-oculta">camellos de Simi, pulsa para cambiar</span>
       </button>
     </div>
-    <div class="pie-jugadora">
-      <p class="rupias"><span id="rupias-0">0</span><span class="visualmente-oculta">rupias</span></p>
-      <p class="sellos" id="sellos-0"></p>
-    </div>
   </article>
   <article class="jugadora" data-j="1">
     <div class="cabeza-jugadora">
       <h2>Inés</h2>
+      <p class="sellos" id="sellos-1"></p>
+    </div>
+    <div class="pie-jugadora">
+      <p class="rupias"><span id="rupias-1">0</span><span class="visualmente-oculta">rupias</span></p>
       <button type="button" class="btn-rebano" data-camellos="1">
         <span aria-hidden="true">🐫</span> <b id="camellos-1">0</b>
         <span class="visualmente-oculta">camellos de Inés, pulsa para cambiar</span>
       </button>
-    </div>
-    <div class="pie-jugadora">
-      <p class="rupias"><span id="rupias-1">0</span><span class="visualmente-oculta">rupias</span></p>
-      <p class="sellos" id="sellos-1"></p>
     </div>
   </article>
 </section>
@@ -714,11 +732,12 @@ dialog > .btn { width: 100%; }
 </main>
 
 <footer class="barra">
-  <button type="button" class="btn estrecho" id="btn-deshacer" disabled>↩︎ Deshacer</button>
-  <button type="button" class="btn" id="btn-fin-ronda">Se acabó el mazo</button>
+  <p class="ultima-accion" id="ultima-accion" role="status" aria-live="polite">Toca una mercancía para registrar una venta.</p>
+  <div class="botones">
+    <button type="button" class="btn estrecho" id="btn-deshacer" disabled>↩︎ Deshacer</button>
+    <button type="button" class="btn" id="btn-fin-ronda">Se acabó el mazo</button>
+  </div>
 </footer>
-
-<div id="anuncio" class="visualmente-oculta" role="status" aria-live="polite"></div>
 
 <dialog id="dlg-venta" aria-labelledby="venta-titulo"></dialog>
 <dialog id="dlg-camellos" aria-labelledby="camellos-titulo"></dialog>
@@ -857,7 +876,7 @@ function deshacer() {
   estado = pilaDeshacer.pop();
   persistir();
   pintar();
-  anunciar('Deshecho.');
+  anunciar('Última acción deshecha')
 }
 
 /* =================================================================
@@ -924,9 +943,9 @@ function registrarVenta(j, idMercancia, cartas) {
   pintar();
 
   const m = mercancia(idMercancia);
-  anunciar(`${JUGADORAS[j]} vende ${cartas} de ${m.nombre.toLowerCase()}: ` +
-    `${suma(fichas) + ficha} rupias${ficha ? `, con ficha de bonus de ${ficha}` : ''}. ` +
-    `Va por ${rupias(j)}.`);
+  // Cabe en un renglón de la barra y se sigue entendiendo dicho en voz alta
+  anunciar(`${JUGADORAS[j]} vende ${cartas} ${m.nombre.toLowerCase()} · ` +
+    `${suma(fichas)}${ficha ? ` + ${ficha}` : ''} = ${suma(fichas) + ficha} rupias`);
 
   if (nivel) mostrarBonus(j, ficha);
 }
@@ -951,7 +970,8 @@ function cambiarCamellos(j, delta) {
   t.camellos = Math.max(0, t.camellos + delta);
   persistir();
   pintar();
-  anunciar(`${JUGADORAS[j]} tiene ${t.camellos} camellos.`);
+  anunciar(`${JUGADORAS[j]} ${delta > 0 ? 'coge' : 'gasta'} ${Math.abs(delta)} ` +
+    `${Math.abs(delta) === 1 ? 'camello' : 'camellos'} · rebaño ${t.camellos}`);
 }
 
 /* =================================================================
@@ -1025,7 +1045,7 @@ function cerrarRonda(ganadorCamellos, ganadoraForzada) {
     Object.assign(p, rondaNueva());
     persistir();
     pintar();
-    anunciar(`Empieza la ronda ${p.ronda}.`);
+    anunciar(`Empieza la ronda ${p.ronda}`);
   }
 }
 
@@ -1117,7 +1137,7 @@ function pintarMontones() {
   }
 }
 
-function anunciar(texto) { $('#anuncio').textContent = texto; }
+function anunciar(texto) { $('#ultima-accion').textContent = texto; }
 
 /* =================================================================
    Diálogos
@@ -1670,7 +1690,7 @@ function nuevaPartida() {
   persistir();
   pintar();
   cerrarTodo();
-  anunciar('Partida nueva.');
+  anunciar('Partida nueva')
 }
 
 /* =================================================================
