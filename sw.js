@@ -6,7 +6,7 @@
  * copia vieja pegada para siempre (que es lo que pasa con caché primero).
  */
 
-const CACHE = 'jaipur-v6';
+const CACHE = 'jaipur-v7';
 
 const ARCHIVOS = [
   '.',

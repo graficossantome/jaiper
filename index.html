@@ -776,6 +776,10 @@ dialog > .btn { width: 100%; }
    palabras. La media tinta se queda solo en los botones del pie, que son los
    únicos que ahí no llevan a ninguna parte. */
 body.espejo button { pointer-events: none; }
+/* Salvo dentro de los diálogos: los que salen en el espejo son el fin de ronda,
+   el fin de partida y las estadísticas, y sus botones solo cierran, enseñan
+   datos o comparten la imagen. Ninguno mueve la partida. */
+body.espejo dialog button { pointer-events: auto; }
 body.espejo .barra .botones { opacity: .5; }
 body.espejo #btn-menu { display: none; }
 .banda-espejo {
@@ -910,7 +914,11 @@ const CLAVE_ESPEJO = CLAVE + '-espejo';
    Estado
    ================================================================= */
 
-let estado = cargar() || estadoInicial();
+/* Lo que había guardado se aparta aparte de `estado` porque el espejo lo
+   necesita: al bajar la primera partida compara con ello para saber si el final
+   que ve es de ahora o es el que ya tenía visto de antes. */
+const guardado = cargar();
+let estado = guardado || estadoInicial();
 const pilaDeshacer = [];   // en memoria: deshacer sirve durante la partida, no entre sesiones
 
 function estadoInicial() {
@@ -1478,6 +1486,16 @@ function pintarRecuento() {
       <div class="opciones">${opcionCamellos}</div>
     </fieldset>
 
+    ${tablaRupias(a, b)}
+
+    ${bloqueVeredicto}
+    <button type="button" class="enlace-sutil" data-cerrar>Volver a la partida</button>
+  `;
+}
+
+/** La tabla de rupias de una ronda. La usan el recuento y las pantallas del espejo. */
+function tablaRupias(a, b) {
+  return `
     <table class="recuento">
       <caption>Rupias de la ronda</caption>
       <thead>
@@ -1492,27 +1510,44 @@ function pintarRecuento() {
         <tr><th scope="row">Camellos</th><td>${a.camello}</td><td>${b.camello}</td></tr>
         <tr class="total"><th scope="row">Total</th><td>${a.total}</td><td>${b.total}</td></tr>
       </tbody>
-    </table>
+    </table>`;
+}
 
-    ${bloqueVeredicto}
-    <button type="button" class="enlace-sutil" data-cerrar>Volver a la partida</button>
-  `;
+/**
+ * El recuento de una ronda ya cerrada, tal como quedó guardado. Las partidas de
+ * versiones viejas no llevan el desglose: de aquellas solo se puede enseñar el
+ * resultado, y es mejor eso que una tabla llena de ceros.
+ */
+function recuentoGuardado(r) {
+  if (r.detalle) return tablaRupias(r.detalle[0], r.detalle[1]);
+  return `
+    <div class="duelo">
+      <div><span class="cifra">${r.puntos[0]}</span><span class="quien">${JUGADORAS[0]}</span></div>
+      <span class="vs">rupias</span>
+      <div><span class="cifra">${r.puntos[1]}</span><span class="quien">${JUGADORAS[1]}</span></div>
+    </div>`;
 }
 
 /* --- Fin de partida ---------------------------------------------- */
 
-function mostrarFinDePartida(campeona) {
+/**
+ * `rondaFinal` solo lo pasa el espejo: allí la victoria llega de golpe, sin
+ * haber visto antes el recuento, así que la ronda que decidió la partida se
+ * enseña aquí mismo.
+ */
+function mostrarFinDePartida(campeona, rondaFinal) {
   const s = estadisticas();
   abrir($('#dlg-ronda'), `
     <h2 id="ronda-titulo">Gana ${JUGADORAS[campeona]}</h2>
     <p class="sub">Dos sellos de excelencia. Queda guardado en el cara a cara.</p>
+    ${rondaFinal ? recuentoGuardado(rondaFinal) : ''}
     <div class="duelo">
       <div><span class="cifra" data-j="0">${s.partidas[0]}</span><span class="quien">${JUGADORAS[0]}</span></div>
       <span class="vs">partidas</span>
       <div><span class="cifra" data-j="1">${s.partidas[1]}</span><span class="quien">${JUGADORAS[1]}</span></div>
     </div>
     <div class="acciones">
-      <button type="button" class="btn principal" data-cerrar>Otra partida</button>
+      <button type="button" class="btn principal" data-cerrar>${ESPEJO ? 'Volver al marcador' : 'Otra partida'}</button>
       <button type="button" class="btn" data-abrir-stats>Estadísticas</button>
     </div>
     <button type="button" class="enlace-sutil" data-compartir>Compartir el resultado</button>
@@ -2130,6 +2165,61 @@ function subirEstado() {
   }, 400);
 }
 
+/* --- Lo que pasa al otro lado también se ve aquí --------------------
+   El espejo pintaba solo el tablero, así que el final de una ronda y el de una
+   partida le llegaban como un marcador que se ponía a cero de golpe: quien
+   miraba se quedaba sin el recuento y sin la celebración, justo lo mejor de la
+   partida. Ahora se compara lo que baja con lo que ya había y, cuando se cierra
+   una ronda o se gana la partida, sale la misma pantalla que en el otro móvil.
+
+   La comparación es por número de rondas y de partidas jugadas, no por marcador:
+   así deshacer una jugada (que hace bajar esas cuentas) nunca celebra nada. */
+
+function marcaDe(datos) {
+  return {
+    rondas: (datos.partida.rondas || []).length,
+    partidas: datos.historial.length
+  };
+}
+
+/* Sin nada guardado no hay con qué comparar: la primera bajada solo toma nota,
+   porque si no el espejo recién estrenado celebraría la última victoria vieja. */
+let marcaEspejo = guardado ? marcaDe(guardado) : null;
+
+/** Con la partida ya pintada, enseña la pantalla del final que se acaba de cruzar. */
+function pantallaDelEspejo(previa) {
+  const marca = marcaDe(estado);
+  marcaEspejo = marca;
+  if (!previa) return;
+
+  if (marca.partidas > previa.partidas) {
+    const partida = estado.historial[0];
+    // El confeti lo tira `mostrarFinDePartida`, igual que en el otro móvil.
+    mostrarFinDePartida(partida.ganadora, partida.rondas[partida.rondas.length - 1]);
+    return;
+  }
+  if (marca.rondas > previa.rondas) {
+    mostrarRondaCerrada(estado.partida.rondas[marca.rondas - 1], marca.rondas);
+  }
+}
+
+function mostrarRondaCerrada(r, numero) {
+  const sellos = estado.partida.sellos;
+  const veredicto = r.ganadora == null
+    ? `<p class="quien">Ronda sin sello</p>
+       <p class="porque">Empate absoluto: el reglamento no lo resuelve y se decidió en la mesa.</p>`
+    : `<p class="quien">Gana la ronda ${JUGADORAS[r.ganadora]}</p>
+       <p class="porque">Se lleva un sello de excelencia · sellos ${sellos[0]} — ${sellos[1]}</p>`;
+
+  abrir($('#dlg-ronda'), `
+    <h2 id="ronda-titulo">Fin de la ronda ${numero}</h2>
+    <p class="sub">Así ha quedado el recuento en el otro móvil.</p>
+    ${recuentoGuardado(r)}
+    <div class="veredicto">${veredicto}</div>
+    <button type="button" class="btn principal" data-cerrar>Volver al marcador</button>
+  `);
+}
+
 /** En el espejo: baja la partida y la pinta si ha cambiado. */
 let ultimoVisto = null;
 
@@ -2146,12 +2236,16 @@ async function bajarEstado() {
     // Una partida recién creada en la nube viene vacía: no hay nada que pintar todavía.
     if (!fila.estado || !fila.estado.partida) return;
     migrar(fila.estado);
+    const previa = marcaEspejo;
     estado = fila.estado;
     pintar();
     // Se guarda lo último que se bajó: si el móvil que mira se queda sin cobertura
     // y la app se recarga o el sistema la descarta, vuelve con el último marcador
     // conocido en vez de con la partida a cero.
     persistir();
+    // Después de guardar: si el móvil se ha dormido y despierta con la partida ya
+    // ganada, el final sale igual, porque lo que se compara es lo último guardado.
+    pantallaDelEspejo(previa);
   } catch (e) {
     banda.classList.add('sin-conexion');
     banda.textContent = 'Espejo sin conexión: el marcador puede estar viejo';
